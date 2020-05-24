@@ -10,7 +10,7 @@ public interface DAO<T> {
 
     void save(T t_save);
 
-    void saveListOfData(List<T> t_saveList);
+    void saveListOfDataAndDeleteFormerData(List<T> t_saveList);
 
     void update(T t_alt, T t_neu);
 

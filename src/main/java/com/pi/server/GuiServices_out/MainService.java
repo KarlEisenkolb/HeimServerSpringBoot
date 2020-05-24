@@ -1,48 +1,31 @@
 package com.pi.server.GuiServices_out;
 
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.FirestoreClient;
 import com.pi.server.DatabaseManagment.PersistingService;
-import com.pi.server.Models.Weather_current;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Service
 public class MainService {
 
-    private final Firestore firestore;
-    private final FirebaseOptions options;
-
     @Autowired
     private PersistingService persistingService;
 
-    public MainService() throws Exception {
-        File auth_file = new File("./trainingsapp-e9b88-firebase-adminsdk-bf50c-17bfc29c28.json"); //File needs to be in the same directory
-        FileInputStream serviceAccount =
-                new FileInputStream(auth_file);
-
-        options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://trainingsapp-e9b88.firebaseio.com")
-                .build();
-
-        FirebaseApp.initializeApp(options);
-        firestore = FirestoreClient.getFirestore();
-    }
+    public MainService(){}
 
     @EventListener(ApplicationReadyEvent.class)
     public void doWhenReady(){
 
+    }
+
+    public String getTimeAndDateString(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
+        return simpleDateFormat.format(System.currentTimeMillis());
     }
 
     public List getCurrentWeatherContent() {
@@ -64,6 +47,14 @@ public class MainService {
             e.printStackTrace();
         }*/
 
-        return persistingService.getAll();
+        return persistingService.getAll(PersistingService.CurrentWeather);
+    }
+
+    public List getWeatherHourlyForecastContent(){
+        return persistingService.getAll(PersistingService.HourlyWeather);
+    }
+
+    public List getWeatherDailyForecastContent(){
+        return persistingService.getAll(PersistingService.DailyWeather);
     }
 }

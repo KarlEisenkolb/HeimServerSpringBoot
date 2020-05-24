@@ -1,4 +1,51 @@
 body{
-    background-color: black;
+    background: black url('/images/hintergrund.jpg') no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
     color: white;
+}
+
+.custom_main_container{
+    padding: 30px 60px;
+}
+
+.no_margin{
+    margin: 0px;
+}
+
+.row{
+    margin-left: 0px;
+
+}
+
+.no_padding_left{
+    padding-left: 0px;
+}
+
+.day_ueberschrift_margin_bot{
+    margin-bottom: 15px;
+}
+
+#date {
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
+
+.circle {
+    border-radius: 10px;
+    padding: 7px;
+}
+
+.grad {
+  background-image: radial-gradient(circle, white, #343a40, #343a40);
+}
+
+.opacity_and_color {
+    background-color: rgba(52,58,64,0.6);
+}
+
+.table-opacity_and_color{
+    background-color: rgba(52,58,64,0);
 }

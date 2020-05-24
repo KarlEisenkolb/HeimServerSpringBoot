@@ -20,9 +20,18 @@ public class MainController {
     public ModelAndView mainTemplate(){
 
         ModelAndView mav = new ModelAndView(TEMPLATE_MAIN);
+        mav.addObject("time_and_date_string", mainService.getTimeAndDateString());
+
         List weatherList = mainService.getCurrentWeatherContent();
         mav.addObject("latestWeather", weatherList.get(0));
         mav.addObject("currentweatherlist", weatherList);
+
+        List weatherHourlyList = mainService.getWeatherHourlyForecastContent();
+        mav.addObject("hourlyweatherlist", weatherHourlyList);
+
+        List weatherDailyList = mainService.getWeatherDailyForecastContent();
+        mav.addObject("dailyweatherlist", weatherDailyList);
+
         return mav;
     }
 }

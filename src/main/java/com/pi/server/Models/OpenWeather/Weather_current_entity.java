@@ -1,10 +1,10 @@
-package com.pi.server.Models;
+package com.pi.server.Models.OpenWeather;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = Weather_current.TableName)
-public class Weather_current {
+@Entity(name = Weather_current_entity.TableName)
+@Table(name = Weather_current_entity.TableName)
+public class Weather_current_entity {
 
     public final static String TableName = "weather_current";
 
@@ -13,7 +13,7 @@ public class Weather_current {
     private long id;
 
     @Column
-    private long request_timestamp;
+    private long request_timestamp; //timestamp des Servers bei Api-Abfrage und Einspeicherung in Datenbank
 
     @Column
     private long time;
