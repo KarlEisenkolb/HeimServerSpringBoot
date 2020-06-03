@@ -13,18 +13,28 @@ public class Token_FirebaseMessagingOrganisationsApp_entity {
     private int id;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "firebaseID")
     private Nutzer_entity nutzer_entity;
 
     @Column
     private String token;
 
-    public Token_FirebaseMessagingOrganisationsApp_entity(String token, Nutzer_entity nutzer_entity){
-        this.token = token;
+    @Column(length = 510)
+    private String token_crypt_firebase; // Das Token wie es aktuell in Firebase verschlüsselt liegt (für den Löschvorgang)
+
+    @Column
+    private int error_count; // zählt wie oft ein Token benutzt wurde aber das Gerät nicht erreicht wurde... nach einer bestimmten Anzahl wird das Token gelöscht
+
+    public Token_FirebaseMessagingOrganisationsApp_entity(){}
+
+    public Token_FirebaseMessagingOrganisationsApp_entity(String token, String token_CryptFirebase, Nutzer_entity nutzer_entity){
         this.nutzer_entity = nutzer_entity;
+        this.token = token;
+        this.token_crypt_firebase = token_CryptFirebase;
+        error_count = 0;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -46,5 +56,21 @@ public class Token_FirebaseMessagingOrganisationsApp_entity {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public int getError_count() {
+        return error_count;
+    }
+
+    public void setError_count(int error_count) {
+        this.error_count = error_count;
+    }
+
+    public String getToken_CryptFirebase() {
+        return token_crypt_firebase;
+    }
+
+    public void setToken_CryptFirebase(String token_CryptFirebase) {
+        this.token_crypt_firebase = token_CryptFirebase;
     }
 }

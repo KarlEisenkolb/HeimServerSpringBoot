@@ -1,6 +1,7 @@
 package com.pi.server.DatabaseManagment.OpenWeatherDB;
 
-import com.pi.server.DatabaseManagment.DAO;
+import com.pi.server.DatabaseManagment.DAO_Basic;
+import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
 import com.pi.server.Models.OpenWeather.WeatherForecast_hourly_entity;
 import org.springframework.stereotype.Repository;
 
@@ -11,13 +12,18 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public class DAO_MariaDB_HourlyWeather_Impl implements DAO<WeatherForecast_hourly_entity> {
+public class DAO_MariaDB_HourlyWeather_Impl implements DAO_Basic<WeatherForecast_hourly_entity>, DAO_OpenWeather<WeatherForecast_hourly_entity> {
 
     @PersistenceContext
     EntityManager entityManager;
 
     @Override
     public WeatherForecast_hourly_entity get(long id) { return null; }
+
+    @Override
+    public WeatherForecast_hourly_entity get(String id) {
+        return null;
+    }
 
     @Override
     public List<WeatherForecast_hourly_entity> getAll() {

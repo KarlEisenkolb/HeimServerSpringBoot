@@ -1,8 +1,12 @@
 package com.pi.server.Models.Organisationsapp;
 
+import com.pi.server.SecurityHandling.Crypt;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
 @Entity(name = Nutzer_entity.TableName)
 @Table(name = Nutzer_entity.TableName)
@@ -18,15 +22,17 @@ public class Nutzer_entity {
     private String name;
 
     @Column
-    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy="nutzer_entity")
+    @OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="nutzer_entity")
     private List<Token_FirebaseMessagingOrganisationsApp_entity> tokens = new ArrayList<>();
 
-    public Nutzer_entity(String firebaseID, String name, List<String> tokenList){
+    public Nutzer_entity(){}
+
+    public Nutzer_entity(String firebaseID, String name, List<String> tokenListCrypted){
+        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         this.firebaseID = firebaseID;
         this.name = name;
-        for (String token : tokenList){
-            tokens.add(new Token_FirebaseMessagingOrganisationsApp_entity(token, this));
-            System.out.println("TOKEN: " + name + "|" + token );
+        for (String tokenCrypted : tokenListCrypted){
+            tokens.add(new Token_FirebaseMessagingOrganisationsApp_entity(crypt.decryptString(tokenCrypted), tokenCrypted, this));
         }
     }
 

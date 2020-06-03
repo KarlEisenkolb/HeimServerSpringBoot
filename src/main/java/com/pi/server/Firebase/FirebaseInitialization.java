@@ -5,16 +5,14 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-@Service
-public class FirebaseInitializationService {
+public class FirebaseInitialization {
 
-    private static FirebaseInitializationService fs;
+    private static FirebaseInitialization fs;
 
     private Firestore firestoreDB_trainingsapp;
     private Firestore firestoreDB_organisationsapp;
@@ -44,7 +42,7 @@ public class FirebaseInitializationService {
     public static Firestore getFirestoreInstanceOf(String DatabaseIdentifier){
 
         if (fs == null)
-            fs = new FirebaseInitializationService();
+            fs = new FirebaseInitialization();
 
         switch(DatabaseIdentifier){
             case DATABASE_TRAININGSAPP:

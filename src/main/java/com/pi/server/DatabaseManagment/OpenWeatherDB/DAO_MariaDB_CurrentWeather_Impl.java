@@ -1,6 +1,6 @@
 package com.pi.server.DatabaseManagment.OpenWeatherDB;
 
-import com.pi.server.DatabaseManagment.DAO;
+import com.pi.server.DatabaseManagment.DAO_Basic;
 import com.pi.server.Models.OpenWeather.Weather_current_entity;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
@@ -10,13 +10,18 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public class DAO_MariaDB_CurrentWeather_Impl implements DAO<Weather_current_entity> {
+public class DAO_MariaDB_CurrentWeather_Impl implements DAO_Basic<Weather_current_entity> {
 
     @PersistenceContext
     EntityManager entityManager;
 
     @Override
     public Weather_current_entity get(long id) {
+        return null;
+    }
+
+    @Override
+    public Weather_current_entity get(String id) {
         return null;
     }
 
@@ -31,12 +36,6 @@ public class DAO_MariaDB_CurrentWeather_Impl implements DAO<Weather_current_enti
     @Override
     public void save(Weather_current_entity t_save) {
         entityManager.persist(t_save);
-    }
-
-    @Transactional
-    @Override
-    public void saveListOfDataAndDeleteFormerData(List<Weather_current_entity> t_saveList) {
-        entityManager.persist(t_saveList);
     }
 
     @Override
