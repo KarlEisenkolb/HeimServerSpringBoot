@@ -17,12 +17,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ExecutionException;
 
 import static com.pi.server.DatabaseManagment.PersistingService.NutzerOrganisationsapp;
 import static com.pi.server.DatabaseManagment.PersistingService.NutzerOrganisationsapp_withNutzerName;
+import static com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt.*;
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
 @Service
@@ -30,7 +33,9 @@ public class FirebaseMessagingServiceOrganisationsapp {
 
     private final Logger log = LoggerFactory.getLogger(FirebaseMessagingServiceOrganisationsapp.class);
     
-    boolean firstTriggerAfterServerBoot = true;
+    private boolean serverBootSituation = true;
+    private int countOfListenersStartedAfterBoot = 0;
+    private int numberOfTerminListener;
 
     @Autowired
     PersistingService persistingService;
@@ -39,6 +44,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
 
     public FirebaseMessagingServiceOrganisationsapp() {
 
+        numberOfTerminListener = 3;
         firestore = FirebaseInitialization.getFirestoreInstanceOf(FirebaseInitialization.DATABASE_ORGANISATIONSAPP);
         initializeDatabaseListener_organisationsapp(firestore, FirebaseInitialization.FIRESTORE_ORGANISATIONSAPP_NUTZER_COLLECTION);
         initializeDatabaseListener_organisationsapp(firestore, FirebaseInitialization.FIRESTORE_ORGANISATIONSAPP_TASK_COLLECTION_SINGLE);
@@ -71,19 +77,24 @@ public class FirebaseMessagingServiceOrganisationsapp {
             switch (dc.getType()) {
                 case ADDED:
                     log.info("Added, Termin: {}", currentTermin.gibName());
-                    sendPushNotification(currentTermin);
+                    sendPushNotification(currentTermin, DocumentChange.Type.ADDED);
                     break;
                 case MODIFIED:
                     log.info("Modified, Termin: {}", currentTermin.gibName());
-                    //sendPushNotification(currentTermin); Aktuell nicht erfasst wer den Termin modifiziert hat.. jeweils die Anderen müssen benachrichtigt werden.
+                    sendPushNotification(currentTermin, DocumentChange.Type.MODIFIED); //Aktuell nicht erfasst wer den Termin modifiziert hat.. jeweils die Anderen müssen benachrichtigt werden.
                     break;
                 case REMOVED:
                     log.info("Removed, Termin: {}", currentTermin.gibName());
-                    //sendPushNotification(currentTermin); Aktuell nicht erfasst wer den Termin gelöscht hat.. jeweils die Anderen müssen benachrichtigt werden. Besser auf dem Client bearbeiten
+                    sendPushNotification(currentTermin, DocumentChange.Type.REMOVED); //Aktuell nicht erfasst wer den Termin gelöscht hat.. jeweils die Anderen müssen benachrichtigt werden. Besser auf dem Client bearbeiten
                     break;
                 default:
                     break;
             }
+        }
+        if (serverBootSituation) {
+            countOfListenersStartedAfterBoot++;
+            if (countOfListenersStartedAfterBoot == numberOfTerminListener)
+                serverBootSituation = false;
         }
     }
 
@@ -102,7 +113,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
                     ManagingTokenAndNutzer(currentNutzer, nutzerMariaDB);
                     break;
                 case REMOVED:
-                    log.info("Removed, Token: {}", currentNutzer.gibName());
+                    log.info("Removed, Nutzer: {}", currentNutzer.gibName());
                     if (nutzerMariaDB != null)
                         persistingService.delete(nutzerMariaDB);
                     else
@@ -135,17 +146,25 @@ public class FirebaseMessagingServiceOrganisationsapp {
         }
     }
 
-    private void sendPushNotification(Termin_FirebaseCrypt currentTermin) {
-        for (String nutzerToContact : currentTermin.gibSharedTerminNutzerList()) {
-            Nutzer_entity nutzer_entityToContact = (Nutzer_entity) persistingService.get(nutzerToContact, NutzerOrganisationsapp_withNutzerName);
-            for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : nutzer_entityToContact.getTokens())
-                buildNotificationAndSend(currentTermin, tokenEntity);
+    private void sendPushNotification(Termin_FirebaseCrypt currentTermin, Enum type) {
+        if (serverBootSituation)
+            return;
+        else{
+            Nutzer_entity terminBesitzer_entityToContact = (Nutzer_entity) persistingService.get(currentTermin.gibBesitzer(), NutzerOrganisationsapp_withNutzerName);
+            for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : terminBesitzer_entityToContact.getTokens())
+                buildNotificationAndSend(currentTermin, tokenEntity, type);
+
+            for (String nutzerToContact : currentTermin.gibSharedTerminNutzerList()) {
+                Nutzer_entity nutzer_entityToContact = (Nutzer_entity) persistingService.get(nutzerToContact, NutzerOrganisationsapp_withNutzerName);
+                for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : nutzer_entityToContact.getTokens())
+                    buildNotificationAndSend(currentTermin, tokenEntity, type);
+            }
         }
     }
 
-    private void buildNotificationAndSend(Termin_FirebaseCrypt termin, Token_FirebaseMessagingOrganisationsApp_entity tokenEntity){
+    private void buildNotificationAndSend(Termin_FirebaseCrypt termin, Token_FirebaseMessagingOrganisationsApp_entity tokenEntity, Enum type){
         AndroidNotification androidNotification = AndroidNotification.builder()
-                .setTitle(getTitleString(termin)) // Neuer Termin/Task "Carolin streicheln" Fr. 5.6.20 9:20-15:43
+                .setTitle(getTitleString(termin, type))
                 .setBody(getBodyString(termin))
                 .build();
 
@@ -164,26 +183,106 @@ public class FirebaseMessagingServiceOrganisationsapp {
         String response = null;
         try {
             response = FirebaseMessaging.getInstance(FirebaseApp.getInstance(FirebaseInitialization.DATABASE_ORGANISATIONSAPP)).send(message);
+            log.info("Sended PushMessage to: {} | {}", tokenEntity.getNutzer_entity().getName() , termin.gibName());
         } catch (FirebaseMessagingException e) {
-            System.out.println("FIREBASE ERROR CODE: " + e.getErrorCode());
-            e.printStackTrace();
-            persistingService.delete(tokenEntity);
-            DocumentReference docRef = firestore.collection(FirebaseInitialization.FIRESTORE_ORGANISATIONSAPP_NUTZER_COLLECTION).document(tokenEntity.getNutzer_entity().getFirebaseID());
-            ApiFuture<WriteResult> writeResult = docRef.update(Nutzer_FirebaseCrypt.TOKEN_MESSAGING_LIST, FieldValue.arrayRemove(tokenEntity.getToken_CryptFirebase()));
-            try {
-                System.out.println("Update time : " + writeResult.get());
-            } catch (InterruptedException | ExecutionException interruptedException) {
-                interruptedException.printStackTrace();
-            }
+            ExceptionHandlingError404(tokenEntity, e);
         }
 
         // Response is a message ID string.
         //System.out.println("Successfully sent message: " + response);
     }
 
-    private String getTitleString(Termin_FirebaseCrypt termin){
-
-        return termin.gibName();
+    private void ExceptionHandlingError404(Token_FirebaseMessagingOrganisationsApp_entity tokenEntity, FirebaseMessagingException e) {
+        System.out.println("FIREBASE ERROR CODE: " + e.getErrorCode());
+        e.printStackTrace();
+        persistingService.delete(tokenEntity);
+        DocumentReference docRef = firestore.collection(FirebaseInitialization.FIRESTORE_ORGANISATIONSAPP_NUTZER_COLLECTION).document(tokenEntity.getNutzer_entity().getFirebaseID());
+        ApiFuture<WriteResult> writeResult = docRef.update(Nutzer_FirebaseCrypt.TOKEN_MESSAGING_LIST, FieldValue.arrayRemove(tokenEntity.getToken_CryptFirebase()));
+        try {
+            System.out.println("Update time : " + writeResult.get());
+        } catch (InterruptedException | ExecutionException interruptedException) {
+            interruptedException.printStackTrace();
+        }
     }
-    private String getBodyString(Termin_FirebaseCrypt termin){return "";}
+
+    private String getTitleString(Termin_FirebaseCrypt termin, Enum type){
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        String terminType;
+        if (type == DocumentChange.Type.ADDED) {
+            switch ((int) termin.gibType()) {
+                case TYPE_AUFGABE:
+                    terminType = "Neue Aufgabe:";
+                    break;
+                case TYPE_TERMIN:
+                    terminType = "Neuer Termin:";
+                    break;
+                case TYPE_GEBURTSTAG:
+                    terminType = "Neuer Geburtstag:";
+                    break;
+                case TYPE_URLAUB:
+                    terminType = "Neuer Urlaub:";
+                    break;
+                case TYPE_SCHULFERIEN:
+                    terminType = "Neue Schulferien:";
+                    break;
+                case TYPE_FEIERTRAG:
+                    terminType = "Neuer Feiertag:";
+                    break;
+                default:
+                    terminType = "NO TYPE";
+                    break;
+            }
+        } else if (type == DocumentChange.Type.MODIFIED) {
+            long terminErledigungsTime          = termin.gibErledigungsTime();
+            if (terminErledigungsTime == Termin_FirebaseCrypt.TASK_NOT_DONE)
+                terminType = "Aufgabe noch nicht erledigt:";
+            else
+                terminType = "Aufgabe erledigt um " +timeFormatter.format(terminErledigungsTime);
+        }else{
+            switch ((int) termin.gibType()) {
+                case TYPE_AUFGABE:
+                    terminType = "Aufgabe gelöscht:";
+                    break;
+                case TYPE_TERMIN:
+                    terminType = "Termin gelöscht:";
+                    break;
+                case TYPE_GEBURTSTAG:
+                    terminType = "Geburtstag gelöscht:";
+                    break;
+                case TYPE_URLAUB:
+                    terminType = "Urlaub gelöscht:";
+                    break;
+                case TYPE_SCHULFERIEN:
+                    terminType = "Schulferien gelöscht:";
+                    break;
+                case TYPE_FEIERTRAG:
+                    terminType = "Feiertag gelöscht:";
+                    break;
+                default:
+                    terminType = "NO TYPE";
+                    break;
+            }
+        }
+
+        return terminType + " " + termin.gibName() ;
+    }
+    private String getBodyString(Termin_FirebaseCrypt termin){
+        long terminStartTime                = termin.gibStartTimeInMillis();
+        long terminEndTimeOnDay             = termin.gibEndTimeInMillisOnDay();
+
+        ZonedDateTime cStart = ZonedDateTime.ofInstant(Instant.ofEpochMilli(terminStartTime), ZoneId.systemDefault());
+        ZonedDateTime cEnd = ZonedDateTime.ofInstant(Instant.ofEpochMilli(terminEndTimeOnDay), ZoneId.systemDefault());
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE d. MMM");
+
+        String terminTime;
+        if (cStart.getHour() == 0 && cStart.getMinute() == 0 && cEnd.getHour() == 0 && cEnd.getMinute() == 0) //Falls Start und Endzeit = Default (O Uhr) dann nicht anzeigen
+            terminTime = "";
+        else if(cEnd.getHour() == 0 && cEnd.getMinute() == 0) // Startzeit am Tag gesetzt aber Endzeit ist Default => Nur Startzeit zeigen
+            terminTime = timeFormatter.format(termin.gibStartTimeInMillis());
+        else
+            terminTime = timeFormatter.format(termin.gibStartTimeInMillis()) + "-" + timeFormatter.format(termin.gibEndTimeInMillisOnDay());
+
+        return "erstellt von " + termin.gibBesitzer() + " am " + dateFormatter.format(termin.gibStartTimeInMillis()) + " " + terminTime;
+    }
 }

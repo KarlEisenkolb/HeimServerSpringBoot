@@ -7,7 +7,7 @@
     <meta http-equiv="refresh" content="5">
 
     <link rel="shortcut icon" type="image/x-icon" href="images/MethCat.png">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/js/chart.js"></script>
 
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
@@ -19,8 +19,89 @@
     <div class="container-fluid custom_main_container">
         <h1 class="display-2" id="date" th:text="${time_and_date_string}">#time_and_date_string</h1>
         <div class="row">
+
             <div th:insert="fragments/day_card :: day_card"></div>
+
+            <div th:each="dailyitem,iter : ${dailyweatherlist}">
+                <div class="col-md-auto">
+                    <h1 class="display-4 day_ueberschrift_margin_bot" th:id="'time' + ${iter.index}">N.A.:</h1>
+                    <script th:inline="javascript">
+                        var datelist     = /*[[${headingsdates}]]*/;
+                        var iter        = /*[[${iter.index}]]*/;
+                        document.getElementById("time"+iter).innerHTML = datelist[iter];
+                    </script>
+                    <div class="card border-secondary mb-3 opacity_and_color" style="width: 350px;">
+                        <div class="row align-items-center">
+                            <div class="col-md-auto no_padding_left">
+                                <img th:src="@{${'/images/' + dailyitem.icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
+                            </div>
+                            <div class="col-md-auto no_padding_left">
+                                <p class="card-text" th:text="${dailyitem.description}">Wetterbeschreibung n.a.</p>
+                            </div>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-md-auto no_padding_left">
+                                <img src="images/thermometer.svg" alt="Weather Icon" height="60" width="70">
+                            </div>
+                            <div class="col-md-auto no_padding_left">
+                                <p th:text="${'min: ' +dailyitem.temp_min +' °C | max: ' +dailyitem.temp_max +' °C'}" class="card-text no_margin">n.a. °C | n.a. °C gef.</p>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <table class="table table-dark table-opacity_and_color">
+                                <tbody>
+                                <tr>
+                                    <th scope="row">Luftfeuchte</th>
+                                    <td th:text="${dailyitem.humidity +' %'}">5,6 m/s</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Windgeschw.</th>
+                                    <td th:text="${dailyitem.wind_speed +' m/s'}">5,6 m/s</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Sonnenaufgang<br>Sonnenuntergang</th>
+                                    <td th:id="'sun' + ${iter.index}">n.a. Uhr<br>n.a. Uhr</td>
+                                    <script th:inline="javascript">
+                                    var sunrise     = /*[[${dailyitem.sunrise}]]*/;
+                                    var sunset      = /*[[${dailyitem.sunset}]]*/;
+                                    var iter        = /*[[${iter.index}]]*/;
+
+                                    var date_sunrise        = new Date(sunrise*1000);
+                                    var date_sunset         = new Date(sunset*1000);
+
+                                    document.getElementById("sun"+iter).innerHTML = date_sunrise.toLocaleTimeString() +" Uhr<br>" +date_sunset.toLocaleTimeString() +" Uhr";
+                                    </script>
+                                </tr>
+                                <tr>
+                                    <th scope="row">UV-Index</th>
+                                    <td ><span th:text="${dailyitem.uv_index}" th:id="'uv_box' + ${iter.index}" class=circle>5.84</span></td>
+                                    <script th:inline="javascript">
+                                        var uvi     = /*[[${latestWeather.uv_index}]]*/;
+                                        var iter    = /*[[${iter.index}]]*/;
+
+                                        if (uvi <3){
+                                            document.getElementById("uv_box"+iter).style.backgroundColor = "green";
+                                        }else if (uvi<6){
+                                            document.getElementById("uv_box"+iter).style.backgroundColor = "darkorange";
+                                        }else if (uvi<8){
+                                            document.getElementById("uv_box"+iter).style.backgroundColor = "darkorange";
+                                        }else if (uvi<11){
+                                            document.getElementById("uv_box"+iter).style.backgroundColor = "red";
+                                        }else{
+                                            document.getElementById("uv_box"+iter).style.backgroundColor = "violet";
+                                        }
+                                    </script>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+
 </body>
 </html>

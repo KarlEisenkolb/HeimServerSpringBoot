@@ -43,13 +43,11 @@ public class DAO_MariaDB_DailyWeather_Impl implements DAO_Basic<WeatherForecast_
             entityManager.persist(item);
     }
 
+    @Transactional
     @Override
-    public void update(WeatherForecast_daily_entity t_alt, WeatherForecast_daily_entity t_neu) {
+    public void update(WeatherForecast_daily_entity t_alt, WeatherForecast_daily_entity t_neu) { }
 
-    }
-
+    @Transactional
     @Override
-    public void delete(WeatherForecast_daily_entity t_del) {
-
-    }
+    public void delete(WeatherForecast_daily_entity t_del) { }
 }

@@ -11,7 +11,7 @@
         </div>
         <div class="row align-items-center">
             <div class="col-md-auto no_padding_left">
-                <img th:src="@{${'/images/' + hourlyweatherlist[3].icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
+                <img th:src="@{${'/images/' + hourlyweatherlist[4].icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
             </div>
             <div class="col-md-auto no_padding_left">
                 <p class="card-text" id="weatherdescriptionin3h">Wetterbeschreibung</p>
@@ -61,7 +61,7 @@
                 </tr>
                 <tr>
                     <th scope="row">UV-Index</th>
-                    <td ><span th:text="${latestWeather.uv_index}" id="uv_box" class=circle>5.84</span></td>
+                    <td ><span th:text="${latestWeather.uv_index}" th:id="uv_box" class=circle>5.84</span></td>
                     <script th:inline="javascript">
                         uvi = /*[[${latestWeather.uv_index}]]*/;
                         if (uvi <3){

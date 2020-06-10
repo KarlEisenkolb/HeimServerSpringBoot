@@ -59,6 +59,7 @@ public class DAO_MariaDB_TokenOrganisationsapp_Impl implements DAO_Basic<Token_F
         entityManager.persist(t_save);
     }
 
+    @Transactional
     @Override
     public void update(Token_FirebaseMessagingOrganisationsApp_entity t_alt, Token_FirebaseMessagingOrganisationsApp_entity t_neu) {
 

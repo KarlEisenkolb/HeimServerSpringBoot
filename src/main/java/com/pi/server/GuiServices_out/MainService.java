@@ -2,12 +2,14 @@ package com.pi.server.GuiServices_out;
 
 
 import com.pi.server.DatabaseManagment.PersistingService;
+import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +28,14 @@ public class MainService {
     public String getTimeAndDateString(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
         return simpleDateFormat.format(System.currentTimeMillis());
+    }
+
+    public List<String> getDateHeadingStrings(List dayData){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE d MMM");
+        List<String> dateList = new ArrayList<>();
+        for (WeatherForecast_daily_entity dailyItem : (List<WeatherForecast_daily_entity>)dayData)
+            dateList.add(simpleDateFormat.format(dailyItem.getTime()*1000));
+        return dateList;
     }
 
     public List getCurrentWeatherContent() {

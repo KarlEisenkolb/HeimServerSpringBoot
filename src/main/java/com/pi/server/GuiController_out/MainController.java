@@ -30,7 +30,9 @@ public class MainController {
         mav.addObject("hourlyweatherlist", weatherHourlyList);
 
         List weatherDailyList = mainService.getWeatherDailyForecastContent();
+        weatherDailyList.remove(0);
         mav.addObject("dailyweatherlist", weatherDailyList);
+        mav.addObject("headingsdates", mainService.getDateHeadingStrings(weatherDailyList));
 
         return mav;
     }

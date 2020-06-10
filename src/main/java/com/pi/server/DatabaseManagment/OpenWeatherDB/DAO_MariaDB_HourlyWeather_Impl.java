@@ -44,11 +44,13 @@ public class DAO_MariaDB_HourlyWeather_Impl implements DAO_Basic<WeatherForecast
             entityManager.persist(item);
     }
 
+    @Transactional
     @Override
     public void update(WeatherForecast_hourly_entity t_alt, WeatherForecast_hourly_entity t_neu) {
 
     }
 
+    @Transactional
     @Override
     public void delete(WeatherForecast_hourly_entity t_del) {
 

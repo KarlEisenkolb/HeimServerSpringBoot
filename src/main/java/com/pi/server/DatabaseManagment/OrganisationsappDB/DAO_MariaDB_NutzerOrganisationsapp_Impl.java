@@ -2,11 +2,13 @@ package com.pi.server.DatabaseManagment.OrganisationsappDB;
 
 import com.pi.server.DatabaseManagment.DAO_Basic;
 import com.pi.server.Models.Organisationsapp.Nutzer_entity;
+import com.pi.server.Models.Organisationsapp.Token_FirebaseMessagingOrganisationsApp_entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
@@ -61,14 +63,19 @@ public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<Nutzer
         entityManager.persist(t_save);
     }
 
+    @Transactional
     @Override
     public void update(Nutzer_entity t_alt, Nutzer_entity t_neu) {
 
     }
 
+    @Transactional
     @Override
     public void delete(Nutzer_entity t_del) {
-        //entityManager.remove(entityManager.contains(t_del) ? t_del : entityManager.merge(t_del));
-        entityManager.remove(t_del);
+        Query q2 = entityManager.createQuery("DELETE FROM " + Token_FirebaseMessagingOrganisationsApp_entity.TableName + " b WHERE b.nutzer_entity.firebaseID = :id");
+        int deleted2 = q2.setParameter("id", t_del.getFirebaseID()).executeUpdate();
+
+        Query q1 = entityManager.createQuery("DELETE FROM " + Nutzer_entity.TableName + " a WHERE a.firebaseID = :id");
+        int deleted1 = q1.setParameter("id", t_del.getFirebaseID()).executeUpdate();
     }
 }

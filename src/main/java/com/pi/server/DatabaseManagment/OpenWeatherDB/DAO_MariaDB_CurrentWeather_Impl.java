@@ -38,11 +38,13 @@ public class DAO_MariaDB_CurrentWeather_Impl implements DAO_Basic<Weather_curren
         entityManager.persist(t_save);
     }
 
+    @Transactional
     @Override
     public void update(Weather_current_entity t_alt, Weather_current_entity t_neu) {
 
     }
 
+    @Transactional
     @Override
     public void delete(Weather_current_entity t_del) {
 
