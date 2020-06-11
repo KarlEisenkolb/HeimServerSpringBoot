@@ -183,7 +183,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
         String response = null;
         try {
             response = FirebaseMessaging.getInstance(FirebaseApp.getInstance(FirebaseInitialization.DATABASE_ORGANISATIONSAPP)).send(message);
-            log.info("Sended PushMessage to: {} | {}", tokenEntity.getNutzer_entity().getName() , termin.gibName());
+            log.info("Sended PushMessage to: {} | {} | Token: {}", tokenEntity.getNutzer_entity().getName() , termin.gibName(), tokenEntity.getToken());
         } catch (FirebaseMessagingException e) {
             ExceptionHandlingError404(tokenEntity, e);
         }

@@ -2,6 +2,8 @@ package com.pi.server.Models.Organisationsapp;
 
 import com.pi.server.SecurityHandling.Crypt;
 
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,19 +48,33 @@ public class Termin_FirebaseCrypt {
     public static final String TASK_ERLEDIGUNGSZEIT         = "pwKdIwldhHw";
     public static final String YEAR_OF_BIRTH                = "uRqLbXpUbDb";
 
+    @Column
     private long lRksIjfMsVs; // startTimeMillis UTC
+    @Column
     private String iDhwMpxsHos; // endTimeMillisOnDay UTC
+    @Column
     private long pSqDjfpLRlf; // endTimeMillis UTC
+    @Column
     private String mDkwpOsHXdk; // id
+    @Column
     private String pKqSoynVsqp; // name
+    @Column
     private String rSlwbaTqdKs; // description
+    @Column
     private String kWfpwsBSEsw; // besitzer
+    @ElementCollection
     private List<String> gWoVdLmsswl = new ArrayList<>(); // sharedTerminNutzerList
+    @Column
     private String nGdfkDcnkDn; // type // Aufgabe, Termin, Urlaub, Feiertag, Schulferien, Geburtstag
+    @Column
     private String wjWkFvpoASs; // type_second // Privat, Beruflich
+    @Column
     private String sdKwXpeIjns; // importance // Wichtig, Unwichtig
+    @Column
     private String pSwqbSJFfwf; // wiederholungsIntervall
+    @Column
     private long pwKdIwldhHw; // erledigungsdatum // Erledigungsdatum des Tasks UTC
+    @Column
     private String uRqLbXpUbDb; // Geburtsjahr für Type Geburtstag und Anzeigen des Alters am Geburtstag
 
     public long getlRksIjfMsVs() { return lRksIjfMsVs; }
@@ -70,10 +86,10 @@ public class Termin_FirebaseCrypt {
     public String getkWfpwsBSEsw() { return kWfpwsBSEsw; }
     public List<String> getgWoVdLmsswl() { return gWoVdLmsswl; }
     public String getnGdfkDcnkDn() { return nGdfkDcnkDn; }
-    public String getwjWkFvpoASs() { return wjWkFvpoASs; }
-    public String getsdKwXpeIjns() { return sdKwXpeIjns; }
+    public String getWjWkFvpoASs() { return wjWkFvpoASs; }
+    public String getSdKwXpeIjns() { return sdKwXpeIjns; }
     public String getpSwqbSJFfwf() { return pSwqbSJFfwf; }
-    public long getpwKdIwldhHw() { return pwKdIwldhHw; }
+    public long getPwKdIwldhHw() { return pwKdIwldhHw; }
     public String getuRqLbXpUbDb() { return uRqLbXpUbDb; }
 
     public Termin_FirebaseCrypt(){}
@@ -110,7 +126,48 @@ public class Termin_FirebaseCrypt {
         this.uRqLbXpUbDb = crypt.encryptLong(geburtsjahr);
     }
 
-
+    public void setlRksIjfMsVs(long lRksIjfMsVs) {
+        this.lRksIjfMsVs = lRksIjfMsVs;
+    }
+    public void setiDhwMpxsHos(String iDhwMpxsHos) {
+        this.iDhwMpxsHos = iDhwMpxsHos;
+    }
+    public void setpSqDjfpLRlf(long pSqDjfpLRlf) {
+        this.pSqDjfpLRlf = pSqDjfpLRlf;
+    }
+    public void setmDkwpOsHXdk(String mDkwpOsHXdk) {
+        this.mDkwpOsHXdk = mDkwpOsHXdk;
+    }
+    public void setpKqSoynVsqp(String pKqSoynVsqp) {
+        this.pKqSoynVsqp = pKqSoynVsqp;
+    }
+    public void setrSlwbaTqdKs(String rSlwbaTqdKs) {
+        this.rSlwbaTqdKs = rSlwbaTqdKs;
+    }
+    public void setkWfpwsBSEsw(String kWfpwsBSEsw) {
+        this.kWfpwsBSEsw = kWfpwsBSEsw;
+    }
+    public void setgWoVdLmsswl(List<String> gWoVdLmsswl) {
+        this.gWoVdLmsswl = gWoVdLmsswl;
+    }
+    public void setnGdfkDcnkDn(String nGdfkDcnkDn) {
+        this.nGdfkDcnkDn = nGdfkDcnkDn;
+    }
+    public void setWjWkFvpoASs(String wjWkFvpoASs) {
+        this.wjWkFvpoASs = wjWkFvpoASs;
+    }
+    public void setSdKwXpeIjns(String sdKwXpeIjns) {
+        this.sdKwXpeIjns = sdKwXpeIjns;
+    }
+    public void setpSwqbSJFfwf(String pSwqbSJFfwf) {
+        this.pSwqbSJFfwf = pSwqbSJFfwf;
+    }
+    public void setPwKdIwldhHw(long pwKdIwldhHw) {
+        this.pwKdIwldhHw = pwKdIwldhHw;
+    }
+    public void setuRqLbXpUbDb(String uRqLbXpUbDb) {
+        this.uRqLbXpUbDb = uRqLbXpUbDb;
+    }
 
     public long gibStartTimeInMillis(){
         return getlRksIjfMsVs(); }
@@ -144,15 +201,15 @@ public class Termin_FirebaseCrypt {
         return crypt.decryptLong(getnGdfkDcnkDn());}
     public long gibType_Second(){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
-        return crypt.decryptLong(getwjWkFvpoASs());}
+        return crypt.decryptLong(getWjWkFvpoASs());}
     public long gibImportance(){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
-        return crypt.decryptLong(getsdKwXpeIjns());}
+        return crypt.decryptLong(getSdKwXpeIjns());}
     public long gibWiederholungsIntervall(){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         return crypt.decryptLong(getpSwqbSJFfwf());}
     public long gibErledigungsTime(){
-        return getpwKdIwldhHw();}
+        return getPwKdIwldhHw();}
     public long gibGeburtsjahr(){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         return crypt.decryptLong(getuRqLbXpUbDb());}
