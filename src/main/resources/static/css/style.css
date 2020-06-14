@@ -49,3 +49,7 @@ body{
 .table-opacity_and_color{
     background-color: rgba(52,58,64,0);
 }
+
+.table-blackcolor{
+    background-color: rgba(50,50,50,1);
+}

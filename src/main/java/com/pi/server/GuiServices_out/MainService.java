@@ -1,14 +1,17 @@
 package com.pi.server.GuiServices_out;
 
-
 import com.pi.server.DatabaseManagment.PersistingService;
 import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
+import com.pi.server.Models.Organisationsapp.DayMitTerminen_mav;
+import com.pi.server.Models.Organisationsapp.TerminDecrypted_mav;
+import com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-
 import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +25,6 @@ public class MainService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void doWhenReady(){
-
     }
 
     public String getTimeAndDateString(){
@@ -30,33 +32,18 @@ public class MainService {
         return simpleDateFormat.format(System.currentTimeMillis());
     }
 
-    public List<String> getDateHeadingStrings(List dayData){
+    public List<String> getDateHeadingStrings(int anzahl_Tageskacheln){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE d MMM");
+
+        ZonedDateTime todayDate = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         List<String> dateList = new ArrayList<>();
-        for (WeatherForecast_daily_entity dailyItem : (List<WeatherForecast_daily_entity>)dayData)
-            dateList.add(simpleDateFormat.format(dailyItem.getTime()*1000));
+        for(int i = 1; i <= anzahl_Tageskacheln; i++)
+            dateList.add(simpleDateFormat.format(todayDate.plus(i, ChronoUnit.DAYS).toInstant().toEpochMilli()));
+
         return dateList;
     }
 
     public List getCurrentWeatherContent() {
-        // Create a Map to store the data we want to set
-        /*Map<String, Object> docData = new HashMap<>();
-        docData.put("name", "Los Angeles");
-        docData.put("state", "CA");
-        docData.put("country", "humhumhu");
-        docData.put("regions", Arrays.asList("west_coast", "socal"));
-        // Add a new document (asynchronously) in collection "cities" with id "LA"
-        ApiFuture<WriteResult> future = firestore.collection("cities").document("LA").set(docData);
-
-        DocumentReference document = firestore.collection("cities").document("LA");
-        try {
-            return document.get().get().getString("country"); // schlägt fehl!
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }*/
-
         return persistingService.getAll(PersistingService.CurrentWeather);
     }
 
@@ -66,5 +53,100 @@ public class MainService {
 
     public List getWeatherDailyForecastContent(){
         return persistingService.getAll(PersistingService.DailyWeather);
+    }
+
+    public List getTermineForDaysToDisplay(int anzahl_Tageskacheln){
+        ZonedDateTime todayDate = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
+        List<DayMitTerminen_mav> daylist = new ArrayList<>();
+        daylist.add(new DayMitTerminen_mav(todayDate.toInstant().toEpochMilli()));
+        for(int i = 1; i <= anzahl_Tageskacheln; i++)
+            daylist.add(new DayMitTerminen_mav(todayDate.plus(i, ChronoUnit.DAYS).toInstant().toEpochMilli()));
+
+        setTermineInDayList(daylist);
+        return daylist;
+    }
+
+    private void setTermineInDayList(List<DayMitTerminen_mav> daylist){
+        List<Termin_FirebaseCrypt> completeTerminList = (List<Termin_FirebaseCrypt>)(Object) persistingService.getAllTermineInTimeframe(daylist.get(0).getTime_utc(), daylist.get(daylist.size()-1).getTime_utc());
+        for (DayMitTerminen_mav day : daylist){
+            long currentDayInMillis = day.getTime_utc();
+            long nextDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentDayInMillis), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli();
+
+            for (Termin_FirebaseCrypt termin :completeTerminList){
+                if (currentDayInMillis <= termin.gibStartTimeInMillis() && nextDayInMillis > termin.gibStartTimeInMillis())
+                    day.add_termin(prepareTerminToDisplay(termin, day));
+                else if(termin.gibWiederholungsIntervall() != Termin_FirebaseCrypt.REPETITION_SINGLE && termin.gibStartTimeInMillis() == termin.gibEndTimeInMillis()){
+                    addingRepetitionTerminHandling(day, termin);
+                }
+            }
+        }
+    }
+
+    private void addingRepetitionTerminHandling(DayMitTerminen_mav day, Termin_FirebaseCrypt termin) {
+        ZonedDateTime zdt_currentDay = ZonedDateTime.ofInstant(Instant.ofEpochMilli(day.getTime_utc()), ZoneId.systemDefault());
+        ZonedDateTime zdt_currentTermin = ZonedDateTime.ofInstant(Instant.ofEpochMilli(termin.gibStartTimeInMillis()), ZoneId.systemDefault());
+
+        switch ((int) termin.gibWiederholungsIntervall()) {
+            case (int) Termin_FirebaseCrypt.REPETITION_DAY:
+                day.add_termin(prepareTerminToDisplay(termin, day));
+                break;
+            case (int) Termin_FirebaseCrypt.REPETITION_WEEK:
+                if (zdt_currentTermin.getDayOfWeek() == zdt_currentDay.getDayOfWeek()) {
+                    day.add_termin(prepareTerminToDisplay(termin, day));
+                }
+                break;
+            case (int) Termin_FirebaseCrypt.REPETITION_MONTH:
+                if (zdt_currentTermin.getDayOfMonth() == zdt_currentDay.getDayOfMonth()) {
+                    day.add_termin(prepareTerminToDisplay(termin, day));
+                }
+                break;
+            case (int) Termin_FirebaseCrypt.REPETITION_YEAR:
+                if (zdt_currentTermin.getDayOfMonth() == zdt_currentDay.getDayOfMonth() && zdt_currentTermin.getMonth() == zdt_currentDay.getMonth()) {
+                    day.add_termin(prepareTerminToDisplay(termin, day));
+                }
+                break;
+        }
+    }
+
+    private TerminDecrypted_mav prepareTerminToDisplay(Termin_FirebaseCrypt termin, DayMitTerminen_mav currentDay){
+        long currentDayInMillis = currentDay.getTime_utc();
+
+        return new TerminDecrypted_mav(
+                getUhrzeitString(termin),
+                getNameString(termin, currentDayInMillis),
+                termin.gibDescription(),
+                termin.gibType(),
+                termin.gibErledigungsTime()
+        );
+    }
+
+    private String getNameString(Termin_FirebaseCrypt termin, long currentDayInMillis) {
+        String name;
+        if (termin.gibType() == Termin_FirebaseCrypt.TYPE_GEBURTSTAG){
+            LocalDate currentGeburtstag = Instant.ofEpochMilli(currentDayInMillis).atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate geburtstag        = LocalDate.of((int) termin.gibGeburtsjahr(), currentGeburtstag.getMonth(), currentGeburtstag.getDayOfMonth());
+            Period period = Period.between(geburtstag, currentGeburtstag);
+            name = termin.gibName() + " " + period.getYears() + "ter";
+        } else
+            name = termin.gibName();
+        return name;
+    }
+
+    private String getUhrzeitString(Termin_FirebaseCrypt termin) {
+        long terminStartTime                = termin.gibStartTimeInMillis();
+        long terminEndTimeOnDay             = termin.gibEndTimeInMillisOnDay();
+
+        ZonedDateTime cStart = ZonedDateTime.ofInstant(Instant.ofEpochMilli(terminStartTime), ZoneId.systemDefault());
+        ZonedDateTime cEnd = ZonedDateTime.ofInstant(Instant.ofEpochMilli(terminEndTimeOnDay), ZoneId.systemDefault());
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+
+        String uhrzeit;
+        if (cStart.getHour() == 0 && cStart.getMinute() == 0 && cEnd.getHour() == 0 && cEnd.getMinute() == 0) //Falls Start und Endzeit = Default (O Uhr) dann nicht anzeigen
+            uhrzeit = "";
+        else if(cEnd.getHour() == 0 && cEnd.getMinute() == 0) // Startzeit am Tag gesetzt aber Endzeit ist Default => Nur Startzeit zeigen
+            uhrzeit = timeFormatter.format(termin.gibStartTimeInMillis());
+        else
+            uhrzeit = timeFormatter.format(termin.gibStartTimeInMillis()) + "-" + timeFormatter.format(termin.gibEndTimeInMillisOnDay());
+        return uhrzeit;
     }
 }

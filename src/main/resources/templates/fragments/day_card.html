@@ -30,8 +30,16 @@
                 <img src="images/thermometer.svg" alt="Weather Icon" height="60" width="70">
             </div>
             <div class="col-md-auto no_padding_left">
-                <p th:text="${latestWeather.temp +' °C | ' +latestWeather.feels_like_temp +' °C gefühlt'}" class="card-text no_margin">24,3 °C | 22,5 °C gef.</p>
-                <p th:text="${'min: ' +dailyweatherlist[0].temp_min +' °C | max: ' +dailyweatherlist[0].temp_max +' °C'}" class="card-text no_margin">24,3 °C | 22,5 °C gef.</p>
+                <p th:text="${latestWeather.temp +' °C | ' +latestWeather.feels_like_temp +' °C gefühlt'}" class="card-text no_margin">N.A. °C | N.A. °C gef.</p>
+                <p class="card-text" id="temperaturin3h">Wetterbeschreibung</p>
+                <script th:inline="javascript">
+                    var temperatur          = /*[[${hourlyweatherlist[4].temp}]]*/;
+                    var unix_timestamp      = /*[[${hourlyweatherlist[4].time}]]*/;
+                    var date                = new Date(unix_timestamp*1000);
+                    var hours               = date.getHours();
+                    var minutes             = date.getMinutes();
+                    document.getElementById("temperaturin3h").innerHTML = temperatur+" °C um " +date.getHours() +" Uhr"
+                </script>
             </div>
         </div>
 
@@ -41,10 +49,6 @@
                 <tr>
                     <th scope="row">Luftfeuchte</th>
                     <td th:text="${latestWeather.humidity +' %'}">5,6 m/s</td>
-                </tr>
-                <tr>
-                    <th scope="row">Windgeschw.</th>
-                    <td th:text="${latestWeather.wind_speed +' m/s'}">5,6 m/s</td>
                 </tr>
                 <tr>
                     <th scope="row">Sonnenaufgang<br>Sonnenuntergang</th>
@@ -79,6 +83,56 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+    <div th:if="${not #lists.isEmpty(currentdayterminlist.terminlist)}">
+        <div class="card border-secondary mb-3 opacity_and_color" style="width: 350px">
+            <div class="card-body">
+                <table class="table table-dark no_margin table-opacity_and_color">
+                    <tbody>
+                        <tr th:each="termin,terminiter:${currentdayterminlist.terminlist}">
+                            <td th:id="'termin_name' + ${terminiter.index}">N.A.</td>
+                                <script th:inline="javascript">
+                                    var name            = /*[[${termin.name}]]*/;
+                                    var type            = /*[[${termin.type}]]*/;
+                                    var erledigungszeit = /*[[${termin.erledigungszeit}]]*/;
+
+                                    var terminiter      = /*[[${terminiter.index}]]*/;
+                                    var element = document.getElementById("termin_name"+terminiter);
+
+                                    if (type == 0){ // Aufgabe
+                                        if (erledigungszeit == 0){ // nicht erledigt
+                                            element.innerHTML = "<img src=\"/images/checkbox.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                        }else{
+                                            element.innerHTML = "<img src=\"/images/checkbox_checked.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                        }
+                                    }else if (type == 2){ // Geburtstag
+                                        element.innerHTML = "<img src=\"/images/birthday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                        element.classList.add('bg-dark');
+                                    }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
+                                        element.innerHTML = "<img src=\"/images/holiday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                        element.classList.add('bg-dark');
+                                    }else{
+                                        element.innerHTML = name;
+                                    }
+                                </script>
+                            <td th:text="${termin.uhrzeit}" th:id="'termin_uhrzeit' + ${terminiter.index}">N.A.</td>
+                                <script th:inline="javascript">
+                                    var type            = /*[[${termin.type}]]*/;
+
+                                    var terminiter      = /*[[${terminiter.index}]]*/;
+                                    var element = document.getElementById("termin_uhrzeit"+terminiter);
+
+                                    if (type == 2){ // Geburtstag
+                                        element.classList.add('bg-dark');
+                                    }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
+                                        element.classList.add('bg-dark');
+                                    }
+                                </script>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

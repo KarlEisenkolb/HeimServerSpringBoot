@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -78,14 +77,17 @@ public class FirebaseMessagingServiceOrganisationsapp {
                 case ADDED:
                     log.info("Added, Termin: {}", currentTermin.gibName());
                     sendPushNotification(currentTermin, DocumentChange.Type.ADDED);
+                    persistingService.save(currentTermin);
                     break;
                 case MODIFIED:
                     log.info("Modified, Termin: {}", currentTermin.gibName());
-                    sendPushNotification(currentTermin, DocumentChange.Type.MODIFIED); //Aktuell nicht erfasst wer den Termin modifiziert hat.. jeweils die Anderen müssen benachrichtigt werden.
+                    sendPushNotification(currentTermin, DocumentChange.Type.MODIFIED); //Aktuell nicht erfasst wer den Termin modifiziert hat.. Nur Aufgaben werden modifziert (abgehakt)
+                    persistingService.update(currentTermin, currentTermin);
                     break;
                 case REMOVED:
                     log.info("Removed, Termin: {}", currentTermin.gibName());
-                    sendPushNotification(currentTermin, DocumentChange.Type.REMOVED); //Aktuell nicht erfasst wer den Termin gelöscht hat.. jeweils die Anderen müssen benachrichtigt werden. Besser auf dem Client bearbeiten
+                    sendPushNotification(currentTermin, DocumentChange.Type.REMOVED); //Aktuell nicht erfasst wer den Termin gelöscht hat.. alle werden benachrichtigt
+                    persistingService.delete(currentTermin);
                     break;
                 default:
                     break;

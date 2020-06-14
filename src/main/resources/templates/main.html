@@ -56,10 +56,6 @@
                                     <td th:text="${dailyitem.humidity +' %'}">5,6 m/s</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Windgeschw.</th>
-                                    <td th:text="${dailyitem.wind_speed +' m/s'}">5,6 m/s</td>
-                                </tr>
-                                <tr>
                                     <th scope="row">Sonnenaufgang<br>Sonnenuntergang</th>
                                     <td th:id="'sun' + ${iter.index}">n.a. Uhr<br>n.a. Uhr</td>
                                     <script th:inline="javascript">
@@ -75,9 +71,9 @@
                                 </tr>
                                 <tr>
                                     <th scope="row">UV-Index</th>
-                                    <td ><span th:text="${dailyitem.uv_index}" th:id="'uv_box' + ${iter.index}" class=circle>5.84</span></td>
+                                    <td ><span th:text="${dailyitem.uv_index}" th:id="'uv_box' + ${iter.index}" class=circle>N.A.</span></td>
                                     <script th:inline="javascript">
-                                        var uvi     = /*[[${latestWeather.uv_index}]]*/;
+                                        var uvi     = /*[[${dailyitem.uv_index}]]*/;
                                         var iter    = /*[[${iter.index}]]*/;
 
                                         if (uvi <3){
@@ -97,25 +93,60 @@
                             </table>
                         </div>
                     </div>
+                    <div th:if="${not #lists.isEmpty(dayterminlist[iter.index].terminlist)}">
+                        <div class="card border-secondary mb-3 opacity_and_color" style="width: 350px">
+                            <div class="card-body">
 
-                    <div class="card border-secondary mb-3 opacity_and_color" style="width: 350px">
-                        <div class="card-body">
-                            <table class="table table-dark no_margin table-opacity_and_color">
-                                <tbody>
-                                <tr>
-                                    <td>Treffen mit Anni</td>
-                                    <td>7:20-9:45</td>
-                                </tr>
-                                <tr>
-                                    <td>Jakobus treffen</td>
-                                    <td>7:20-9:45</td>
-                                </tr>
-                                <tr class="bg-primary ">
-                                    <td >Kehrwoche</td>
-                                    <td>7:20-9:45</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                    <table class="table table-dark no_margin table-opacity_and_color">
+                                        <tbody>
+                                            <tr th:each="termin,terminiter:${dayterminlist[iter.index].terminlist}">
+                                                <td th:id="'termin_name' + ${terminiter.index} + ${iter.index}">N.A.</td>
+                                                    <script th:inline="javascript">
+                                                        var name            = /*[[${termin.name}]]*/;
+                                                        var type            = /*[[${termin.type}]]*/;
+                                                        var erledigungszeit = /*[[${termin.erledigungszeit}]]*/;
+
+                                                        var terminiter      = /*[[${terminiter.index}]]*/;
+                                                        var iter            = /*[[${iter.index}]]*/;
+
+                                                        var element = document.getElementById("termin_name"+terminiter+iter);
+
+                                                        if (type == 0){ // Aufgabe
+                                                            if (erledigungszeit == 0){ // nicht erledigt
+                                                                element.innerHTML = "<img src=\"/images/checkbox.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                            }else{
+                                                                element.innerHTML = "<img src=\"/images/checkbox_checked.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                            }
+                                                        }else if (type == 2){ // Geburtstag
+                                                            element.innerHTML = "<img src=\"/images/birthday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                            element.classList.add('bg-dark');
+                                                        }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
+                                                            element.innerHTML = "<img src=\"/images/holiday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                            element.classList.add('bg-dark');
+                                                        }else{
+                                                            element.innerHTML = name;
+                                                        }
+                                                    </script>
+                                                <td th:text="${termin.uhrzeit}" th:id="'termin_uhrzeit' + ${terminiter.index} + ${iter.index}">N.A.</td>
+                                                    <script th:inline="javascript">
+                                                        var type            = /*[[${termin.type}]]*/;
+
+                                                        var terminiter      = /*[[${terminiter.index}]]*/;
+                                                        var iter            = /*[[${iter.index}]]*/;
+
+                                                        var element = document.getElementById("termin_uhrzeit"+terminiter+iter);
+
+                                                        if (type == 2){ // Geburtstag
+                                                            element.classList.add('bg-dark');
+                                                        }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
+                                                            element.classList.add('bg-dark');
+                                                        }
+                                                    </script>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                            </div>
                         </div>
                     </div>
                 </div>

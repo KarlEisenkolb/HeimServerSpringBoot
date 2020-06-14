@@ -2,14 +2,17 @@ package com.pi.server.Models.Organisationsapp;
 
 import com.pi.server.SecurityHandling.Crypt;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
+@Entity(name = Termin_FirebaseCrypt.TableName)
+@Table(name = Termin_FirebaseCrypt.TableName)
 public class Termin_FirebaseCrypt {
+
+    public final static String TableName = "termin_firebase_crypt";
 
     public final static int TYPE_AUFGABE        = 0;
     public final static int TYPE_TERMIN         = 1;
@@ -48,33 +51,35 @@ public class Termin_FirebaseCrypt {
     public static final String TASK_ERLEDIGUNGSZEIT         = "pwKdIwldhHw";
     public static final String YEAR_OF_BIRTH                = "uRqLbXpUbDb";
 
-    @Column
+    @Column(name="starttimemillis_utc")
     private long lRksIjfMsVs; // startTimeMillis UTC
-    @Column
+    @Column(name="endtimemillisonday_utc")
     private String iDhwMpxsHos; // endTimeMillisOnDay UTC
-    @Column
+    @Column(name="endtimemillis_utc")
     private long pSqDjfpLRlf; // endTimeMillis UTC
-    @Column
+    @Id
+    @Column(name="id_firebase")
     private String mDkwpOsHXdk; // id
-    @Column
+    @Column(name="name")
     private String pKqSoynVsqp; // name
-    @Column
+    @Column(name="description")
     private String rSlwbaTqdKs; // description
-    @Column
+    @Column(name="besitzer")
     private String kWfpwsBSEsw; // besitzer
-    @ElementCollection
+    @CollectionTable(name="sharedterminnutzerlist")
+    @ElementCollection(fetch=FetchType.EAGER)
     private List<String> gWoVdLmsswl = new ArrayList<>(); // sharedTerminNutzerList
-    @Column
-    private String nGdfkDcnkDn; // type // Aufgabe, Termin, Urlaub, Feiertag, Schulferien, Geburtstag
-    @Column
+    @Column(name="type")
+    private long nGdfkDcnkDn; // type // Aufgabe, Termin, Urlaub, Feiertag, Schulferien, Geburtstag
+    @Column(name="type_second")
     private String wjWkFvpoASs; // type_second // Privat, Beruflich
-    @Column
+    @Column(name="importance")
     private String sdKwXpeIjns; // importance // Wichtig, Unwichtig
-    @Column
-    private String pSwqbSJFfwf; // wiederholungsIntervall
-    @Column
+    @Column(name="wiederholungsintervall")
+    private long pSwqbSJFfwf; // wiederholungsIntervall //wird im Server im Gegensatz zur App nicht verschlüsselt (für queries)
+    @Column(name="erledigungsdatum")
     private long pwKdIwldhHw; // erledigungsdatum // Erledigungsdatum des Tasks UTC
-    @Column
+    @Column(name="geburtsjahr")
     private String uRqLbXpUbDb; // Geburtsjahr für Type Geburtstag und Anzeigen des Alters am Geburtstag
 
     public long getlRksIjfMsVs() { return lRksIjfMsVs; }
@@ -85,10 +90,10 @@ public class Termin_FirebaseCrypt {
     public String getrSlwbaTqdKs() { return rSlwbaTqdKs; }
     public String getkWfpwsBSEsw() { return kWfpwsBSEsw; }
     public List<String> getgWoVdLmsswl() { return gWoVdLmsswl; }
-    public String getnGdfkDcnkDn() { return nGdfkDcnkDn; }
+    public long getnGdfkDcnkDn() { return nGdfkDcnkDn; }
     public String getWjWkFvpoASs() { return wjWkFvpoASs; }
     public String getSdKwXpeIjns() { return sdKwXpeIjns; }
-    public String getpSwqbSJFfwf() { return pSwqbSJFfwf; }
+    public long getpSwqbSJFfwf() { return pSwqbSJFfwf; }
     public long getPwKdIwldhHw() { return pwKdIwldhHw; }
     public String getuRqLbXpUbDb() { return uRqLbXpUbDb; }
 
@@ -118,10 +123,10 @@ public class Termin_FirebaseCrypt {
         this.kWfpwsBSEsw = crypt.encryptString(besitzer);
         for (String otherUser : sharedTerminNutzerList)
             this.gWoVdLmsswl.add(crypt.encryptString(otherUser));
-        this.nGdfkDcnkDn = crypt.encryptLong(type);
+        this.nGdfkDcnkDn = type;
         this.wjWkFvpoASs = crypt.encryptLong(type_second);
         this.sdKwXpeIjns = crypt.encryptLong(importance);
-        this.pSwqbSJFfwf = crypt.encryptLong(wiederholungsIntervall);
+        this.pSwqbSJFfwf = wiederholungsIntervall;
         this.pwKdIwldhHw = 0; // erledigungsdatum // Erledigungsdatum des Tasks UTC // Initialisiert als NICHT erledigt
         this.uRqLbXpUbDb = crypt.encryptLong(geburtsjahr);
     }
@@ -151,7 +156,8 @@ public class Termin_FirebaseCrypt {
         this.gWoVdLmsswl = gWoVdLmsswl;
     }
     public void setnGdfkDcnkDn(String nGdfkDcnkDn) {
-        this.nGdfkDcnkDn = nGdfkDcnkDn;
+        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
+        this.nGdfkDcnkDn = crypt.decryptLong(nGdfkDcnkDn);
     }
     public void setWjWkFvpoASs(String wjWkFvpoASs) {
         this.wjWkFvpoASs = wjWkFvpoASs;
@@ -160,8 +166,9 @@ public class Termin_FirebaseCrypt {
         this.sdKwXpeIjns = sdKwXpeIjns;
     }
     public void setpSwqbSJFfwf(String pSwqbSJFfwf) {
-        this.pSwqbSJFfwf = pSwqbSJFfwf;
-    }
+        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
+        this.pSwqbSJFfwf = crypt.decryptLong(pSwqbSJFfwf);
+    } //wird im Server im Gegensatz zur App nicht verschlüsselt (für queries)
     public void setPwKdIwldhHw(long pwKdIwldhHw) {
         this.pwKdIwldhHw = pwKdIwldhHw;
     }
@@ -197,8 +204,7 @@ public class Termin_FirebaseCrypt {
         return sharedTerminNutzerList;
     }
     public long gibType(){
-        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
-        return crypt.decryptLong(getnGdfkDcnkDn());}
+        return getnGdfkDcnkDn();}
     public long gibType_Second(){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         return crypt.decryptLong(getWjWkFvpoASs());}
@@ -206,8 +212,7 @@ public class Termin_FirebaseCrypt {
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         return crypt.decryptLong(getSdKwXpeIjns());}
     public long gibWiederholungsIntervall(){
-        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
-        return crypt.decryptLong(getpSwqbSJFfwf());}
+        return getpSwqbSJFfwf();}
     public long gibErledigungsTime(){
         return getPwKdIwldhHw();}
     public long gibGeburtsjahr(){
@@ -249,8 +254,7 @@ public class Termin_FirebaseCrypt {
             this.gWoVdLmsswl.add(crypt.encryptString(otherUser));
     }
     public void setzeType(long type){
-        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
-        this.nGdfkDcnkDn = crypt.encryptLong(type);
+        this.nGdfkDcnkDn = type;
     }
     public void setzeType_Second(long type_second){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
@@ -261,8 +265,7 @@ public class Termin_FirebaseCrypt {
         this.sdKwXpeIjns = crypt.encryptLong(importance);
     }
     public void setzeWiederholungsIntervall(long wiederholungsIntervall){
-        Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
-        this.pSwqbSJFfwf = crypt.encryptLong(wiederholungsIntervall);
+        this.pSwqbSJFfwf = wiederholungsIntervall;
     }
     public void setzeErledigungsTime(long erledigungszeit){
         this.pwKdIwldhHw = erledigungszeit;

@@ -6,6 +6,7 @@ import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
 import com.pi.server.Models.OpenWeather.WeatherForecast_hourly_entity;
 import com.pi.server.Models.OpenWeather.Weather_current_entity;
 import com.pi.server.Models.Organisationsapp.Nutzer_entity;
+import com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt;
 import com.pi.server.Models.Organisationsapp.Token_FirebaseMessagingOrganisationsApp_entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,6 +53,15 @@ public class PersistingService {
     private DAO_Basic dao_tokenOrganisationsapp;
     public final static int NutzerOrganisationsapp_Token = 5;
 
+    @Autowired
+    @Qualifier("DAO_MariaDB_TerminOrganisationsapp_Impl")
+    private DAO_Basic dao_terminOrganisationsapp;
+    public final static int NutzerOrganisationsapp_Termin = 6;
+    @Autowired
+    @Qualifier("DAO_MariaDB_TerminOrganisationsapp_Impl")
+    private DAO_Organisationsapp dao_terminOrganisationsapp_second;
+    public final static int NutzerOrganisationsapp_giveTermineInTimeframe = 7;
+
     public void save (Object obj){
         if (obj instanceof Weather_current_entity)
             dao_current.save(obj);
@@ -59,6 +69,15 @@ public class PersistingService {
             dao_nutzerOrganisationsapp.save(obj);
         else if(obj instanceof Token_FirebaseMessagingOrganisationsApp_entity)
             dao_tokenOrganisationsapp.save(obj);
+        else if(obj instanceof Termin_FirebaseCrypt)
+            dao_terminOrganisationsapp.save(obj);
+        else
+            System.out.println(LOG_TAG + " No known Object to save found!");
+    }
+
+    public void update (Object old_obj, Object new_obj){
+        if (old_obj instanceof Termin_FirebaseCrypt)
+            dao_terminOrganisationsapp.update(old_obj, new_obj);
         else
             System.out.println(LOG_TAG + " No known Object to save found!");
     }
@@ -78,6 +97,10 @@ public class PersistingService {
             System.out.println(LOG_TAG + " No known Object to get from Database requested");
             return null;
         }
+    }
+
+    public List<Object> getAllTermineInTimeframe(long startTime, long endTime){
+        return dao_terminOrganisationsapp_second.getAll_withStartAndEndTime(startTime, endTime);
     }
 
     public List<Object> getAll(int requestedType){
@@ -109,6 +132,8 @@ public class PersistingService {
             dao_nutzerOrganisationsapp.delete(obj);
         else if(obj instanceof Token_FirebaseMessagingOrganisationsApp_entity)
             dao_tokenOrganisationsapp.delete(obj);
+        else if(obj instanceof Termin_FirebaseCrypt)
+            dao_terminOrganisationsapp.delete(obj);
         else {
             System.out.println(LOG_TAG + " No known Object to get from Database requested");
         }

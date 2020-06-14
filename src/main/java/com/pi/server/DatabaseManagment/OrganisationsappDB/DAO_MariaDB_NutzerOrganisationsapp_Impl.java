@@ -45,6 +45,11 @@ public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<Nutzer
     }
 
     @Override
+    public List<Nutzer_entity> getAll_withStartAndEndTime(long startTime, long endTime) {
+        return null;
+    }
+
+    @Override
     public Nutzer_entity get(long id) {
         return null;
     }
