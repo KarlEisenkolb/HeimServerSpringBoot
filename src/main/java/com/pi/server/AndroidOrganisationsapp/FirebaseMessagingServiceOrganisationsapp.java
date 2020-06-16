@@ -7,6 +7,7 @@ import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.messaging.*;
 import com.pi.server.DatabaseManagment.PersistingService;
 import com.pi.server.Firebase.FirebaseInitialization;
+import com.pi.server.GuiServices_out.ServerDataStatusService;
 import com.pi.server.Models.Organisationsapp.Nutzer_FirebaseCrypt;
 import com.pi.server.Models.Organisationsapp.Nutzer_entity;
 import com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt;
@@ -39,6 +40,9 @@ public class FirebaseMessagingServiceOrganisationsapp {
     @Autowired
     PersistingService persistingService;
 
+    @Autowired
+    ServerDataStatusService serverDataStatusService;
+
     private Firestore firestore;
 
     public FirebaseMessagingServiceOrganisationsapp() {
@@ -66,6 +70,8 @@ public class FirebaseMessagingServiceOrganisationsapp {
                     nutzerAndTokenManagment(snapshots);
                 else
                     terminManagment(snapshots);
+                if(!serverBootSituation)
+                    serverDataStatusService.setNewServerStatusAfterDataChange();
             }
         });
     }

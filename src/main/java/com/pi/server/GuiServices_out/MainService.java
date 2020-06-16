@@ -1,13 +1,10 @@
 package com.pi.server.GuiServices_out;
 
 import com.pi.server.DatabaseManagment.PersistingService;
-import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
 import com.pi.server.Models.Organisationsapp.DayMitTerminen_mav;
 import com.pi.server.Models.Organisationsapp.TerminDecrypted_mav;
 import com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -21,14 +18,18 @@ public class MainService {
     @Autowired
     private PersistingService persistingService;
 
+    public final int DATE_SHORT = 0;
+    public final int DATE_LONG = 1;
+
     public MainService(){}
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void doWhenReady(){
-    }
+    public String getTimeAndDateString(int formfactor){
+        SimpleDateFormat simpleDateFormat;
+        if(formfactor == DATE_SHORT)
+            simpleDateFormat = new SimpleDateFormat("'Uhr |' EEE d MMM ");
+        else
+            simpleDateFormat = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
 
-    public String getTimeAndDateString(){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
         return simpleDateFormat.format(System.currentTimeMillis());
     }
 
@@ -68,15 +69,24 @@ public class MainService {
 
     private void setTermineInDayList(List<DayMitTerminen_mav> daylist){
         List<Termin_FirebaseCrypt> completeTerminList = (List<Termin_FirebaseCrypt>)(Object) persistingService.getAllTermineInTimeframe(daylist.get(0).getTime_utc(), daylist.get(daylist.size()-1).getTime_utc());
+        //for(Termin_FirebaseCrypt termin : completeTerminList) //debugging listoutput
+            //System.out.println(termin.gibName());
+
+        long todayInMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); // today in Millis UTC
         for (DayMitTerminen_mav day : daylist){
             long currentDayInMillis = day.getTime_utc();
             long nextDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentDayInMillis), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli();
 
-            for (Termin_FirebaseCrypt termin :completeTerminList){
-                if (currentDayInMillis <= termin.gibStartTimeInMillis() && nextDayInMillis > termin.gibStartTimeInMillis())
+            for (Termin_FirebaseCrypt termin :completeTerminList) {
+                if (currentDayInMillis <= termin.gibStartTimeInMillis() && nextDayInMillis > termin.gibStartTimeInMillis()){
                     day.add_termin(prepareTerminToDisplay(termin, day));
-                else if(termin.gibWiederholungsIntervall() != Termin_FirebaseCrypt.REPETITION_SINGLE && termin.gibStartTimeInMillis() == termin.gibEndTimeInMillis()){
+                }else if(termin.gibWiederholungsIntervall() != Termin_FirebaseCrypt.REPETITION_SINGLE && termin.gibStartTimeInMillis() == termin.gibEndTimeInMillis()){
                     addingRepetitionTerminHandling(day, termin);
+                }else if(termin.gibType() == Termin_FirebaseCrypt.TYPE_AUFGABE){
+                    if (todayInMillis == currentDayInMillis && termin.gibStartTimeInMillis() <= currentDayInMillis && termin.gibErledigungsTime() == Termin_FirebaseCrypt.TASK_NOT_DONE)
+                        day.add_termin(prepareTerminToDisplay(termin, day));
+                    else if(currentDayInMillis <= termin.gibErledigungsTime() && nextDayInMillis > termin.gibErledigungsTime())
+                        day.add_termin(prepareTerminToDisplay(termin, day));
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.pi.server.DatabaseServices_in;
 
 import com.pi.server.DatabaseManagment.PersistingService;
+import com.pi.server.GuiServices_out.ServerDataStatusService;
 import com.pi.server.HttpRequests.CustomHttpRequest;
 import com.pi.server.HttpRequests.ExtractJsonData;
 import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
@@ -31,6 +32,9 @@ public class RepeatingScheduledTasksService {
     @Autowired
     PersistingService persistingService;
 
+    @Autowired
+    ServerDataStatusService serverDataStatusService;
+
     @Scheduled(fixedRate = 1000*60*5)
     public void openWeatherHttpRequest() {
         log.info("OpenWeather Http-Request, One-Call-Api {}", dateFormat.format(new Date()));
@@ -45,6 +49,8 @@ public class RepeatingScheduledTasksService {
 
         List<WeatherForecast_daily_entity> weatherListDaily = ExtractJsonData.extractAllData_daily(jsonResponse);
         persistingService.saveListOfData(weatherListDaily);
+
+        serverDataStatusService.setNewServerStatusAfterDataChange();
     }
 
 }

@@ -4,10 +4,29 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="refresh" content="5">
 
     <link rel="shortcut icon" type="image/x-icon" href="images/MethCat.png">
     <script language="javascript" type="text/javascript" src="/js/chart.js"></script>
+    <script>
+        var last_server_status = sessionStorage.getItem('server_status');;
+        function checkServerForUpdates(){
+            const Http = new XMLHttpRequest();
+            const url='http://localhost:1990/data_status';
+            Http.open("GET", url);
+            Http.send();
+
+            Http.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    var new_server_status = Http.responseText
+                    if (new_server_status != last_server_status){
+                        sessionStorage.setItem('server_status', new_server_status);
+                        location.reload();
+                    }
+                }
+            }
+        }
+        setInterval(checkServerForUpdates, 1000);
+    </script>
 
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
@@ -17,7 +36,25 @@
 <body>
 
     <div class="container-fluid custom_main_container">
-        <h1 class="display-2" id="date" th:text="${time_and_date_string}">#time_and_date_string</h1>
+        <h1 class="display-2" id="date" th:text="${time_and_date_string_long}">N.A.</h1>
+        <script th:inline="javascript">
+            function updateTime(){
+                var date_str        = /*[[${time_and_date_string_short}]]*/;
+                var currentTime     = new Date()
+                var hours           = currentTime.getHours()
+                var minutes         = currentTime.getMinutes()
+                if (minutes < 10){
+                    minutes = "0" + minutes
+                }
+                if (hours < 10){
+                    hours = "0" + hours
+                }
+                var t_str = hours + ":" + minutes + " " + date_str;
+
+                document.getElementById('date').innerHTML = t_str;
+            }
+            setInterval(updateTime, 1000);
+        </script>
         <div class="row">
 
             <div th:insert="fragments/day_card :: day_card"></div>

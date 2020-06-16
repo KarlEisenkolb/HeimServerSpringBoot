@@ -37,7 +37,7 @@ public class DAO_MariaDB_TerminOrganisationsapp_Impl implements DAO_Basic<Termin
 
     @Override
     public List<Termin_FirebaseCrypt> getAll_withStartAndEndTime(long startTime, long endTime) {
-        String queryString = "SELECT t FROM " + Termin_FirebaseCrypt.TableName +" t WHERE (t.lRksIjfMsVs <= " + endTime + " AND t.pSqDjfpLRlf >= " + startTime + ") OR  (t.pSwqbSJFfwf != " + Termin_FirebaseCrypt.REPETITION_SINGLE + " AND t.lRksIjfMsVs = t.pSqDjfpLRlf) ORDER BY t.nGdfkDcnkDn DESC, t.lRksIjfMsVs ASC";
+        String queryString = "SELECT t FROM " + Termin_FirebaseCrypt.TableName +" t WHERE (t.lRksIjfMsVs <= " + endTime + " AND t.pSqDjfpLRlf >= " + startTime + ") OR  (t.pSwqbSJFfwf != " + Termin_FirebaseCrypt.REPETITION_SINGLE + " AND t.lRksIjfMsVs = t.pSqDjfpLRlf) OR (t.nGdfkDcnkDn = " + Termin_FirebaseCrypt.TYPE_AUFGABE + " AND t.lRksIjfMsVs <= " + endTime + " AND (t.pwKdIwldhHw = " + Termin_FirebaseCrypt.TASK_NOT_DONE + " OR (t.pwKdIwldhHw <= " + endTime + " AND t.pwKdIwldhHw >= " + startTime + "))) ORDER BY t.nGdfkDcnkDn DESC, t.lRksIjfMsVs ASC";
         TypedQuery<Termin_FirebaseCrypt> query = entityManager.createQuery(queryString, Termin_FirebaseCrypt.class);
         return query.getResultList();
     }
