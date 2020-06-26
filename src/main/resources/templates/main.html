@@ -7,11 +7,11 @@
 
     <link rel="shortcut icon" type="image/x-icon" href="images/MethCat.png">
     <script language="javascript" type="text/javascript" src="/js/chart.js"></script>
-    <script>
+    <script th:inline="javascript">
         var last_server_status = sessionStorage.getItem('server_status');;
         function checkServerForUpdates(){
-            const Http = new XMLHttpRequest();
-            const url='http://localhost:1990/data_status';
+            const Http  = new XMLHttpRequest();
+            const url   = /*[[${website_get_data_status_url}]]*/;
             Http.open("GET", url);
             Http.send();
 
@@ -35,7 +35,7 @@
 </head>
 <body>
 
-    <div class="container-fluid custom_main_container">
+    <div class="container-fluid custom_main_container" >
         <h1 class="display-2" id="date" th:text="${time_and_date_string_long}">N.A.</h1>
         <script th:inline="javascript">
             function updateTime(){
@@ -104,26 +104,6 @@
                                     var date_sunset         = new Date(sunset*1000);
 
                                     document.getElementById("sun"+iter).innerHTML = date_sunrise.toLocaleTimeString() +" Uhr<br>" +date_sunset.toLocaleTimeString() +" Uhr";
-                                    </script>
-                                </tr>
-                                <tr>
-                                    <th scope="row">UV-Index</th>
-                                    <td ><span th:text="${dailyitem.uv_index}" th:id="'uv_box' + ${iter.index}" class=circle>N.A.</span></td>
-                                    <script th:inline="javascript">
-                                        var uvi     = /*[[${dailyitem.uv_index}]]*/;
-                                        var iter    = /*[[${iter.index}]]*/;
-
-                                        if (uvi <3){
-                                            document.getElementById("uv_box"+iter).style.backgroundColor = "green";
-                                        }else if (uvi<6){
-                                            document.getElementById("uv_box"+iter).style.backgroundColor = "darkorange";
-                                        }else if (uvi<8){
-                                            document.getElementById("uv_box"+iter).style.backgroundColor = "darkorange";
-                                        }else if (uvi<11){
-                                            document.getElementById("uv_box"+iter).style.backgroundColor = "red";
-                                        }else{
-                                            document.getElementById("uv_box"+iter).style.backgroundColor = "violet";
-                                        }
                                     </script>
                                 </tr>
                                 </tbody>

@@ -63,24 +63,6 @@
                         document.getElementById("suni").innerHTML = date_sunrise.toLocaleTimeString() +" Uhr<br>" +date_sunset.toLocaleTimeString() +" Uhr";
                     </script>
                 </tr>
-                <tr>
-                    <th scope="row">UV-Index</th>
-                    <td ><span th:text="${latestWeather.uv_index}" th:id="uv_box" class=circle>5.84</span></td>
-                    <script th:inline="javascript">
-                        uvi = /*[[${latestWeather.uv_index}]]*/;
-                        if (uvi <3){
-                            document.getElementById("uv_box").style.backgroundColor = "green";
-                        }else if (uvi<6){
-                            document.getElementById("uv_box").style.backgroundColor = "darkorange";
-                        }else if (uvi<8){
-                            document.getElementById("uv_box").style.backgroundColor = "darkorange";
-                        }else if (uvi<11){
-                            document.getElementById("uv_box").style.backgroundColor = "red";
-                        }else{
-                            document.getElementById("uv_box").style.backgroundColor = "violet";
-                        }
-                    </script>
-                </tr>
                 </tbody>
             </table>
         </div>

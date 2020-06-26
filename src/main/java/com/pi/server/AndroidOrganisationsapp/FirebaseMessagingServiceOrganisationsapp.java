@@ -82,18 +82,18 @@ public class FirebaseMessagingServiceOrganisationsapp {
             switch (dc.getType()) {
                 case ADDED:
                     log.info("Added, Termin: {}", currentTermin.gibName());
-                    sendPushNotification(currentTermin, DocumentChange.Type.ADDED);
                     persistingService.save(currentTermin);
+                    sendPushNotification(currentTermin, DocumentChange.Type.ADDED);
                     break;
                 case MODIFIED:
                     log.info("Modified, Termin: {}", currentTermin.gibName());
-                    sendPushNotification(currentTermin, DocumentChange.Type.MODIFIED); //Aktuell nicht erfasst wer den Termin modifiziert hat.. Nur Aufgaben werden modifziert (abgehakt)
                     persistingService.update(currentTermin, currentTermin);
+                    sendPushNotification(currentTermin, DocumentChange.Type.MODIFIED); //Aktuell nicht erfasst wer den Termin modifiziert hat.. Nur Aufgaben werden modifziert (abgehakt)
                     break;
                 case REMOVED:
                     log.info("Removed, Termin: {}", currentTermin.gibName());
-                    sendPushNotification(currentTermin, DocumentChange.Type.REMOVED); //Aktuell nicht erfasst wer den Termin gelöscht hat.. alle werden benachrichtigt
                     persistingService.delete(currentTermin);
+                    sendPushNotification(currentTermin, DocumentChange.Type.REMOVED); //Aktuell nicht erfasst wer den Termin gelöscht hat.. alle werden benachrichtigt
                     break;
                 default:
                     break;

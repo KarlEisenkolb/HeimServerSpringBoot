@@ -1,11 +1,12 @@
 body{
-    background: black url('/images/hintergrund.jpg') no-repeat center center;
+    background: black url('/images/wheat_v2.jpg') no-repeat center center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
     color: white;
 }
+
 
 .custom_main_container{
     padding: 30px 60px;

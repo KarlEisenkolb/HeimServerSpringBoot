@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
-import java.util.Random;
 
 @RestController
 public class MainController {
@@ -23,17 +22,22 @@ public class MainController {
     private final int anzahl_Tageskacheln = 7; // anzahl an weiteren tagen nach Heute
     private final Logger log = LoggerFactory.getLogger(MainController.class);
     private final String TEMPLATE_MAIN = "main";
+    private final String WEBSITE_GET_DATA_STATUS_URL = "http://192.168.0.59:1990/data_status";
 
     @RequestMapping("/")
     public ModelAndView mainTemplate(){
         ModelAndView mav = new ModelAndView(TEMPLATE_MAIN);
 
-        mav.addObject("time_and_date_string_long", mainService.getTimeAndDateString(mainService.DATE_LONG));
-        mav.addObject("time_and_date_string_short", mainService.getTimeAndDateString(mainService.DATE_SHORT));
-
+        basicData(mav);
         weatherData(mav);
         organisationsappData(mav);
         return mav;
+    }
+
+    private void basicData(ModelAndView mav) {
+        mav.addObject("website_get_data_status_url", WEBSITE_GET_DATA_STATUS_URL);
+        mav.addObject("time_and_date_string_long", mainService.getTimeAndDateString(mainService.DATE_LONG));
+        mav.addObject("time_and_date_string_short", mainService.getTimeAndDateString(mainService.DATE_SHORT));
     }
 
     @RequestMapping("/data_status")
