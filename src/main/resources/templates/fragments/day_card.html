@@ -1,6 +1,17 @@
 <div th:fragment="day_card" class="col-md-auto">
     <h1 class="display-4 day_ueberschrift_margin_bot">Jetzt:</h1>
-    <div class="card border-secondary mb-3 opacity_and_color" style="width: 350px;">
+    <div class="card border-secondary mb-3" id="weathercard" style="width: 350px;">
+    <script th:inline="javascript">
+        var currentTime         = new Date()
+        var day                 = currentTime.getDay();
+        var element             = document.getElementById("weathercard");
+
+        if (day == 0 || day == 6){ // heute ist So oder Sa dann blauer Hintergrund
+            element.classList.add('opacity_and_color_weekend');
+        }else{
+            element.classList.add('opacity_and_color');
+        }
+    </script>
         <div class="row align-items-center">
             <div class="col-md-auto no_padding_left">
                 <img th:src="@{${'/images/' + latestWeather.icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
@@ -68,7 +79,18 @@
         </div>
     </div>
     <div th:if="${not #lists.isEmpty(currentdayterminlist.terminlist)}">
-        <div class="card border-secondary mb-3 opacity_and_color" style="width: 350px">
+        <div class="card border-secondary mb-3" id="termincard" style="width: 350px">
+        <script th:inline="javascript">
+            var currentTime         = new Date()
+            var day                 = currentTime.getDay();
+            var element             = document.getElementById("termincard");
+
+            if (day == 0 || day == 6){ // heute ist So oder Sa dann blauer Hintergrund
+                element.classList.add('opacity_and_color_weekend');
+            }else{
+                element.classList.add('opacity_and_color');
+            }
+        </script>
             <div class="card-body">
                 <table class="table table-dark no_margin table-opacity_and_color">
                     <tbody>

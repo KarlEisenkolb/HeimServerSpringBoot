@@ -39,18 +39,14 @@ body{
     padding: 7px;
 }
 
-.grad {
-  background-image: radial-gradient(circle, white, #343a40, #343a40);
+.opacity_and_color_weekend{
+    background-color: rgba(37,60,82,0.70);
 }
 
-.opacity_and_color {
+.opacity_and_color{
     background-color: rgba(52,58,64,0.6);
 }
 
 .table-opacity_and_color{
     background-color: rgba(52,58,64,0);
-}
-
-.table-blackcolor{
-    background-color: rgba(50,50,50,1);
 }
