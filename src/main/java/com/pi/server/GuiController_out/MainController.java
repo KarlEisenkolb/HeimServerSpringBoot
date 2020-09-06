@@ -5,6 +5,9 @@ import com.pi.server.GuiServices_out.ServerDataStatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,7 +25,18 @@ public class MainController {
     private final int anzahl_Tageskacheln = 7; // anzahl an weiteren tagen nach Heute
     private final Logger log = LoggerFactory.getLogger(MainController.class);
     private final String TEMPLATE_MAIN = "main";
-    private final String WEBSITE_GET_DATA_STATUS_URL = "http://192.168.0.59:1990/data_status";
+
+    @Value("${server.port}")
+    private int serverPort;
+    @Value("${server.ip}")
+    private String serverIp;
+    private String WEBSITE_GET_DATA_STATUS_URL;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void getServerDataUrlAfterServerStart(){
+            WEBSITE_GET_DATA_STATUS_URL = "http://" + serverIp + ":" + serverPort + "/data_status";
+            System.out.println(WEBSITE_GET_DATA_STATUS_URL);
+    }
 
     @RequestMapping("/")
     public ModelAndView mainTemplate(){

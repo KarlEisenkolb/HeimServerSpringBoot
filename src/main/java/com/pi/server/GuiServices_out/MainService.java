@@ -71,9 +71,9 @@ public class MainService {
         long lastDayInDayListPlusOneDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(daylist.get(daylist.size()-1).getTime_utc()), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli(); // der Endzeitpunkt soll auch Termin beeinhalten die nach 0:00 des Endtages starten
         List<Termin_FirebaseCrypt> completeTerminList = (List<Termin_FirebaseCrypt>)(Object) persistingService.getAllTermineInTimeframe(daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
-        for(Termin_FirebaseCrypt termin : completeTerminList) //debugging listoutput
-            System.out.println(termin.gibName() +"|"+ sdf.format(termin.gibStartTimeInMillis()));
+        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
+        //for(Termin_FirebaseCrypt termin : completeTerminList) //debugging listoutput
+            //System.out.println(termin.gibName() +"|"+ sdf.format(termin.gibStartTimeInMillis()));
 
         long todayInMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); // today in Millis UTC
         for (DayMitTerminen_mav day : daylist){

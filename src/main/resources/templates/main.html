@@ -3,12 +3,12 @@
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-heigth, initial-scale=1, shrink-to-fit=no">
 
     <link rel="shortcut icon" type="image/x-icon" href="images/MethCat.png">
     <script language="javascript" type="text/javascript" src="/js/chart.js"></script>
     <script th:inline="javascript">
-        var last_server_status = sessionStorage.getItem('server_status');;
+        var last_server_status = sessionStorage.getItem('server_status');
         function checkServerForUpdates(){
             const Http  = new XMLHttpRequest();
             const url   = /*[[${website_get_data_status_url}]]*/;
@@ -17,15 +17,16 @@
 
             Http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
-                    var new_server_status = Http.responseText
+                    var new_server_status = Http.responseText;
                     if (new_server_status != last_server_status){
                         sessionStorage.setItem('server_status', new_server_status);
+                        console.log ("last_server_status: " + last_server_status + " new_server_status: " + new_server_status);
                         location.reload();
                     }
                 }
             }
         }
-        setInterval(checkServerForUpdates, 1000);
+        setInterval(checkServerForUpdates, 10000);
     </script>
 
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
@@ -67,7 +68,7 @@
                         var iter        = /*[[${iter.index}]]*/;
                         document.getElementById("time"+iter).innerHTML = datelist[iter];
                     </script>
-                    <div class="card border-secondary mb-3 " th:id="'weathercard' + ${iter.index}" style="width: 350px;">
+                    <div class="card border-secondary mb-3 card_width" th:id="'weathercard' + ${iter.index}">
                     <script th:inline="javascript">
                         var sunrise             = /*[[${dailyitem.sunrise}]]*/;
                         var iter                = /*[[${iter.index}]]*/;
@@ -83,16 +84,16 @@
                         }
                    </script>
                         <div class="row align-items-center">
-                            <div class="col-md-auto no_padding_left">
-                                <img th:src="@{${'/images/' + dailyitem.icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
+                            <div class="col-md-auto no_padding_left_and_right">
+                                <img class="icon_height_width" th:src="@{${'/images/' + dailyitem.icon + '.svg'}}" alt="Weather Icon">
                             </div>
                             <div class="col-md-auto no_padding_left">
                                 <p class="card-text" th:text="${dailyitem.description}">Wetterbeschreibung n.a.</p>
                             </div>
                         </div>
                         <div class="row align-items-center">
-                            <div class="col-md-auto no_padding_left">
-                                <img src="images/thermometer.svg" alt="Weather Icon" height="60" width="70">
+                            <div class="col-md-auto no_padding_left_and_right">
+                                <img class="icon_height_width" src="images/thermometer.svg" alt="Weather Icon">
                             </div>
                             <div class="col-md-auto no_padding_left">
                                 <p th:text="${'min: ' +dailyitem.temp_min +' °C | max: ' +dailyitem.temp_max +' °C'}" class="card-text no_margin">n.a. °C | n.a. °C gef.</p>
@@ -125,7 +126,7 @@
                         </div>
                     </div>
                     <div th:if="${not #lists.isEmpty(dayterminlist[iter.index].terminlist)}">
-                        <div class="card border-secondary mb-3 " th:id="'termincard' + ${iter.index}" style="width: 350px">
+                        <div class="card border-secondary mb-3 card_width" th:id="'termincard' + ${iter.index}">
                         <script th:inline="javascript">
                             var sunrise             = /*[[${dailyitem.sunrise}]]*/;
                             var iter                = /*[[${iter.index}]]*/;
@@ -158,15 +159,15 @@
 
                                                         if (type == 0){ // Aufgabe
                                                             if (erledigungszeit == 0){ // nicht erledigt
-                                                                element.innerHTML = "<img src=\"/images/checkbox.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                                element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/checkbox.svg\">" + " " + name;
                                                             }else{
-                                                                element.innerHTML = "<img src=\"/images/checkbox_checked.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                                element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/checkbox_checked.svg\">" + " " + name;
                                                             }
                                                         }else if (type == 2){ // Geburtstag
-                                                            element.innerHTML = "<img src=\"/images/birthday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                            element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/birthday.svg\">" + " " + name;
                                                             element.classList.add('bg-dark');
                                                         }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
-                                                            element.innerHTML = "<img src=\"/images/holiday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                                            element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/holiday.svg\">" + " " + name;
                                                             element.classList.add('bg-dark');
                                                         }else{
                                                             element.innerHTML = name;

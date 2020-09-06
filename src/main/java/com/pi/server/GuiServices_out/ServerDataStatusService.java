@@ -16,6 +16,7 @@ public class ServerDataStatusService {
         Crypt crypt = new Crypt(Crypt.CRYPT_USE_DEFAULT_KEY);
         String s = crypt.encryptLong(System.currentTimeMillis());
         serverStatus = s.substring(0, Math.min(s.length(), 6));;
+        System.out.println(serverStatus);
     }
 
     public String getServerStatus(){

@@ -1,6 +1,6 @@
 <div th:fragment="day_card" class="col-md-auto">
     <h1 class="display-4 day_ueberschrift_margin_bot">Jetzt:</h1>
-    <div class="card border-secondary mb-3" id="weathercard" style="width: 350px;">
+    <div class="card border-secondary mb-3 card_width" id="weathercard">
     <script th:inline="javascript">
         var currentTime         = new Date()
         var day                 = currentTime.getDay();
@@ -13,19 +13,19 @@
         }
     </script>
         <div class="row align-items-center">
-            <div class="col-md-auto no_padding_left">
-                <img th:src="@{${'/images/' + latestWeather.icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
+            <div class="col-md-auto no_padding_left_and_right">
+                <img class="icon_height_width" th:src="@{${'/images/' + latestWeather.icon + '.svg'}}" alt="Weather Icon">
             </div>
             <div class="col-md-auto no_padding_left">
                 <p class="card-text" th:text="${latestWeather.description}">Wetterbeschreibung</p>
             </div>
         </div>
         <div class="row align-items-center">
-            <div class="col-md-auto no_padding_left">
-                <img th:src="@{${'/images/' + hourlyweatherlist[4].icon + '.svg'}}" alt="Weather Icon" height="60" width="70">
+            <div class="col-md-auto no_padding_left_and_right">
+                <img class="icon_height_width" th:src="@{${'/images/' + hourlyweatherlist[4].icon + '.svg'}}" alt="Weather Icon">
             </div>
             <div class="col-md-auto no_padding_left">
-                <p class="card-text" id="weatherdescriptionin3h">Wetterbeschreibung</p>
+                <p class="card-text no_margin" id="weatherdescriptionin3h">Wetterbeschreibung</p>
                 <script th:inline="javascript">
                     var weatherdescription  = /*[[${hourlyweatherlist[4].description}]]*/;
                     var unix_timestamp      = /*[[${hourlyweatherlist[4].time}]]*/;
@@ -37,12 +37,12 @@
             </div>
         </div>
         <div class="row align-items-center">
-            <div class="col-md-auto no_padding_left">
-                <img src="images/thermometer.svg" alt="Weather Icon" height="60" width="70">
+            <div class="col-md-auto no_padding_left_and_right">
+                <img class="icon_height_width" src="images/thermometer.svg" alt="Weather Icon">
             </div>
             <div class="col-md-auto no_padding_left">
                 <p th:text="${latestWeather.temp +' °C | ' +latestWeather.feels_like_temp +' °C gefühlt'}" class="card-text no_margin">N.A. °C | N.A. °C gef.</p>
-                <p class="card-text" id="temperaturin3h">Wetterbeschreibung</p>
+                <p class="card-text no_margin" id="temperaturin3h">Wetterbeschreibung</p>
                 <script th:inline="javascript">
                     var temperatur          = /*[[${hourlyweatherlist[4].temp}]]*/;
                     var unix_timestamp      = /*[[${hourlyweatherlist[4].time}]]*/;
@@ -79,7 +79,7 @@
         </div>
     </div>
     <div th:if="${not #lists.isEmpty(currentdayterminlist.terminlist)}">
-        <div class="card border-secondary mb-3" id="termincard" style="width: 350px">
+        <div class="card border-secondary mb-3 card_width" id="termincard">
         <script th:inline="javascript">
             var currentTime         = new Date()
             var day                 = currentTime.getDay();
@@ -106,15 +106,15 @@
 
                                     if (type == 0){ // Aufgabe
                                         if (erledigungszeit == 0){ // nicht erledigt
-                                            element.innerHTML = "<img src=\"/images/checkbox.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                            element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/checkbox.svg\">" + " " + name;
                                         }else{
-                                            element.innerHTML = "<img src=\"/images/checkbox_checked.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                            element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/checkbox_checked.svg\">" + " " + name;
                                         }
                                     }else if (type == 2){ // Geburtstag
-                                        element.innerHTML = "<img src=\"/images/birthday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                        element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/birthday.svg\">" + " " + name;
                                         element.classList.add('bg-dark');
                                     }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
-                                        element.innerHTML = "<img src=\"/images/holiday.svg\" width=\"25\" height=\"25\">" + " " + name;
+                                        element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/holiday.svg\">" + " " + name;
                                         element.classList.add('bg-dark');
                                     }else{
                                         element.innerHTML = name;
