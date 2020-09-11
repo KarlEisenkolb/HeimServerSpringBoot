@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,8 @@ public class ExtractJsonData {
 
     public static List<WeatherForecast_hourly_entity> extractAllData_hourly(String jsonResponse) {
         List<WeatherForecast_hourly_entity> listHourly = new ArrayList<>();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm");
+
         try {
             JSONObject jsonObj = new JSONObject(jsonResponse);
             JSONArray hourly = jsonObj.getJSONArray("hourly");
@@ -62,6 +65,7 @@ public class ExtractJsonData {
 
                 weather_hourly.setRequestTimestamp(System.currentTimeMillis());
                 weather_hourly.setTime(            currentHour.getLong("dt"));
+                weather_hourly.setTime_string(dateFormatter.format(currentHour.getLong("dt") * 1000));
                 //weather_hourly.setSunrise(         current.getLong("sunrise"));           //not in Data hourly
                 //weather_hourly.setSunset(          current.getLong("sunset"));            // not in Data hourly
                 weather_hourly.setTemp(            currentHour.getDouble("temp"));
@@ -74,6 +78,7 @@ public class ExtractJsonData {
                 //weather_hourly.setVisibility(      current.getDouble("visibility"));      //not in Data hourly
                 weather_hourly.setWind_speed(      currentHour.getDouble("wind_speed"));
                 weather_hourly.setWind_deg(        currentHour.getDouble("wind_deg"));
+                weather_hourly.setPop(        currentHour.getDouble("pop") * 100);
 
                 JSONArray weather = currentHour.getJSONArray("weather");
                 JSONObject zero = weather.getJSONObject(0);

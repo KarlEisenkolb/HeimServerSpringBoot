@@ -23,6 +23,9 @@ public class WeatherForecast_hourly_entity {
     private long time;
 
     @Column
+    private String time_string;
+
+    @Column
     private long sunrise;
 
     @Column
@@ -69,6 +72,9 @@ public class WeatherForecast_hourly_entity {
 
     @Column
     private String icon;
+
+    @Column
+    private double pop;
 
     public long getId() {
         return id;
@@ -220,5 +226,21 @@ public class WeatherForecast_hourly_entity {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getTime_string() {
+        return time_string;
+    }
+
+    public void setTime_string(String time_string) {
+        this.time_string = time_string;
+    }
+
+    public double getPop() {
+        return pop;
+    }
+
+    public void setPop(double pop) {
+        this.pop = pop;
     }
 }
