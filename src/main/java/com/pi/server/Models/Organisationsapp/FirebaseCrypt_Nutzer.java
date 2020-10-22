@@ -7,7 +7,7 @@ import java.util.List;
 
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
-public class Nutzer_FirebaseCrypt {
+public class FirebaseCrypt_Nutzer {
 
     public static final String NO_TOKEN = "no_token";
 
@@ -19,9 +19,9 @@ public class Nutzer_FirebaseCrypt {
     private String kHObgqSdsno; // document ID
     private List<String> iFwpcRndwlS; // token für Firebase Messaging (Liste weil ein Nutzer mehrere Devices haben kann)
 
-    public Nutzer_FirebaseCrypt(){}
+    public FirebaseCrypt_Nutzer(){}
 
-    public Nutzer_FirebaseCrypt(String name, String id){
+    public FirebaseCrypt_Nutzer(String name, String id){
         Crypt cryptNormal = new Crypt(CRYPT_USE_DEFAULT_KEY);
         this.oSodwHoHSmx = cryptNormal.encryptString(name);
         this.kHObgqSdsno = cryptNormal.encryptString(id);

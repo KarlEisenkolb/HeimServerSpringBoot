@@ -1,17 +1,17 @@
 package com.pi.server.Models.Organisationsapp;
 
 
-public class TerminDecrypted_mav {
+public class Mav_TerminDecrypted {
     private String uhrzeit;
     private String name;
     private String description;
     private long type;
     private long erledigungszeit;
 
-    public TerminDecrypted_mav(){
+    public Mav_TerminDecrypted(){
     }
 
-    public TerminDecrypted_mav(String uhrzeit,
+    public Mav_TerminDecrypted(String uhrzeit,
                                String name,
                                String description,
                                long type,

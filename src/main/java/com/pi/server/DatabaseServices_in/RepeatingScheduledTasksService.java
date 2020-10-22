@@ -45,10 +45,10 @@ public class RepeatingScheduledTasksService {
         persistingService.save(weather_current);
 
         List<WeatherForecast_hourly_entity> weatherListHourly = ExtractJsonData.extractAllData_hourly(jsonResponse);
-        persistingService.saveListOfData(weatherListHourly);
+        persistingService.saveListOfDataAndDeleteFormerData(weatherListHourly);
 
         List<WeatherForecast_daily_entity> weatherListDaily = ExtractJsonData.extractAllData_daily(jsonResponse);
-        persistingService.saveListOfData(weatherListDaily);
+        persistingService.saveListOfDataAndDeleteFormerData(weatherListDaily);
 
         serverDataStatusService.setNewServerStatusAfterDataChange();
     }

@@ -52,7 +52,7 @@ public class ExtractJsonData {
 
     public static List<WeatherForecast_hourly_entity> extractAllData_hourly(String jsonResponse) {
         List<WeatherForecast_hourly_entity> listHourly = new ArrayList<>();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm EEE");
 
         try {
             JSONObject jsonObj = new JSONObject(jsonResponse);
@@ -136,6 +136,7 @@ public class ExtractJsonData {
                 //weather_daily.setVisibility(      currentDay.getDouble("visibility"));
                 weather_daily.setWind_speed(      currentDay.getDouble("wind_speed"));
                 weather_daily.setWind_deg(        currentDay.getDouble("wind_deg"));
+                weather_daily.setPop(        currentDay.getDouble("pop") * 100);
 
                 JSONArray weather = currentDay.getJSONArray("weather");
                 JSONObject zero = weather.getJSONObject(0);

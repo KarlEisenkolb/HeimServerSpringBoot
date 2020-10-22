@@ -8,11 +8,11 @@ import java.util.List;
 
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
-@Entity(name = Termin_FirebaseCrypt.TableName)
-@Table(name = Termin_FirebaseCrypt.TableName)
-public class Termin_FirebaseCrypt {
+@Entity(name = FirebaseCrypt_Termin_entity.TableName)
+@Table(name = FirebaseCrypt_Termin_entity.TableName)
+public class FirebaseCrypt_Termin_entity {
 
-    public final static String TableName = "termin_firebase_crypt";
+    public final static String TableName = "organisationsapp_termin_crypt";
 
     public final static int TYPE_AUFGABE        = 0;
     public final static int TYPE_TERMIN         = 1;
@@ -66,7 +66,7 @@ public class Termin_FirebaseCrypt {
     private String rSlwbaTqdKs; // description
     @Column(name="besitzer")
     private String kWfpwsBSEsw; // besitzer
-    @CollectionTable(name="sharedterminnutzerlist")
+    @CollectionTable(name="organisationsapp_sharedterminnutzer")
     @ElementCollection(fetch=FetchType.EAGER)
     private List<String> gWoVdLmsswl = new ArrayList<>(); // sharedTerminNutzerList
     @Column(name="type")
@@ -97,21 +97,21 @@ public class Termin_FirebaseCrypt {
     public long getPwKdIwldhHw() { return pwKdIwldhHw; }
     public String getuRqLbXpUbDb() { return uRqLbXpUbDb; }
 
-    public Termin_FirebaseCrypt(){}
+    public FirebaseCrypt_Termin_entity(){}
 
-    public Termin_FirebaseCrypt(long startTimeInMillis,
-                  long endTimeInMillisOnDay,
-                  long endTimeInMillis,
-                  String id,
-                  String name,
-                  String description,
-                  String besitzer,
-                  List<String> sharedTerminNutzerList,
-                  long type,
-                  long type_second,
-                  long importance,
-                  long wiederholungsIntervall,
-                  long geburtsjahr)
+    public FirebaseCrypt_Termin_entity(long startTimeInMillis,
+                                       long endTimeInMillisOnDay,
+                                       long endTimeInMillis,
+                                       String id,
+                                       String name,
+                                       String description,
+                                       String besitzer,
+                                       List<String> sharedTerminNutzerList,
+                                       long type,
+                                       long type_second,
+                                       long importance,
+                                       long wiederholungsIntervall,
+                                       long geburtsjahr)
     {
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         this.lRksIjfMsVs = startTimeInMillis;

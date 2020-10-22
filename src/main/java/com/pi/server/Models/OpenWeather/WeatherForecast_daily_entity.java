@@ -70,6 +70,9 @@ public class WeatherForecast_daily_entity {
     @Column
     private String icon;
 
+    @Column
+    private double pop;
+
     public long getId() {
         return id;
     }
@@ -330,5 +333,13 @@ public class WeatherForecast_daily_entity {
 
     public void setFeels_like_temp_morn(double feels_like_temp_morn) {
         this.feels_like_temp_morn = feels_like_temp_morn;
+    }
+
+    public double getPop() {
+        return pop;
+    }
+
+    public void setPop(double pop) {
+        this.pop = pop;
     }
 }

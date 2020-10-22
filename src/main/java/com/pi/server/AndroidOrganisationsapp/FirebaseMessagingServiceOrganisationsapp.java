@@ -8,9 +8,9 @@ import com.google.firebase.messaging.*;
 import com.pi.server.DatabaseManagment.PersistingService;
 import com.pi.server.Firebase.FirebaseInitialization;
 import com.pi.server.GuiServices_out.ServerDataStatusService;
-import com.pi.server.Models.Organisationsapp.Nutzer_FirebaseCrypt;
-import com.pi.server.Models.Organisationsapp.Nutzer_entity;
-import com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt;
+import com.pi.server.Models.Organisationsapp.FirebaseCrypt_Nutzer;
+import com.pi.server.Models.Organisationsapp.OrganisationsApp_Nutzer_entity;
+import com.pi.server.Models.Organisationsapp.FirebaseCrypt_Termin_entity;
 import com.pi.server.Models.Organisationsapp.Token_FirebaseMessagingOrganisationsApp_entity;
 import com.pi.server.SecurityHandling.Crypt;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 import static com.pi.server.DatabaseManagment.PersistingService.NutzerOrganisationsapp;
 import static com.pi.server.DatabaseManagment.PersistingService.NutzerOrganisationsapp_withNutzerName;
-import static com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt.*;
+import static com.pi.server.Models.Organisationsapp.FirebaseCrypt_Termin_entity.*;
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
 @Service
@@ -78,7 +78,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
 
     private void terminManagment(QuerySnapshot snapshots){
         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-            Termin_FirebaseCrypt currentTermin = dc.getDocument().toObject(Termin_FirebaseCrypt.class);
+            FirebaseCrypt_Termin_entity currentTermin = dc.getDocument().toObject(FirebaseCrypt_Termin_entity.class);
             switch (dc.getType()) {
                 case ADDED:
                     log.info("Added, Termin: {}", currentTermin.gibName());
@@ -108,8 +108,8 @@ public class FirebaseMessagingServiceOrganisationsapp {
 
     private void nutzerAndTokenManagment(QuerySnapshot snapshots){
         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-            Nutzer_FirebaseCrypt currentNutzer = dc.getDocument().toObject(Nutzer_FirebaseCrypt.class);
-            Nutzer_entity nutzerMariaDB = (Nutzer_entity) persistingService.get(currentNutzer.gibId(), NutzerOrganisationsapp);
+            FirebaseCrypt_Nutzer currentNutzer = dc.getDocument().toObject(FirebaseCrypt_Nutzer.class);
+            OrganisationsApp_Nutzer_entity nutzerMariaDB = (OrganisationsApp_Nutzer_entity) persistingService.get(currentNutzer.gibId(), NutzerOrganisationsapp);
 
             switch (dc.getType()) {
                 case ADDED:
@@ -133,11 +133,11 @@ public class FirebaseMessagingServiceOrganisationsapp {
         }
     }
 
-    private void ManagingTokenAndNutzer(Nutzer_FirebaseCrypt currentNutzer, Nutzer_entity nutzerMariaDB) {
+    private void ManagingTokenAndNutzer(FirebaseCrypt_Nutzer currentNutzer, OrganisationsApp_Nutzer_entity nutzerMariaDB) {
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         if (nutzerMariaDB == null) {
             log.info("Added, Nutzer From Firebase Not Found in Maria and Added: {} | with {} Tokens", currentNutzer.gibName(), currentNutzer.gibFirebaseMessagingNutzerTokenList().size());
-            persistingService.save(new Nutzer_entity(currentNutzer.gibId(), currentNutzer.gibName(), currentNutzer.getiFwpcRndwlS()));
+            persistingService.save(new OrganisationsApp_Nutzer_entity(currentNutzer.gibId(), currentNutzer.gibName(), currentNutzer.getiFwpcRndwlS()));
         }else { // Nutzer existiert bereits in ServerDB, jetzt wird jedes Token überprüft und notfalls geupdated
             for (String tokenFirebaseCrypt : currentNutzer.getiFwpcRndwlS()) {
                 String tokenFirebase = crypt.decryptString(tokenFirebaseCrypt);
@@ -154,23 +154,23 @@ public class FirebaseMessagingServiceOrganisationsapp {
         }
     }
 
-    private void sendPushNotification(Termin_FirebaseCrypt currentTermin, Enum type) {
+    private void sendPushNotification(FirebaseCrypt_Termin_entity currentTermin, Enum type) {
         if (serverBootSituation)
             return;
         else{
-            Nutzer_entity terminBesitzer_entityToContact = (Nutzer_entity) persistingService.get(currentTermin.gibBesitzer(), NutzerOrganisationsapp_withNutzerName);
+            OrganisationsApp_Nutzer_entity terminBesitzer_entityToContact = (OrganisationsApp_Nutzer_entity) persistingService.get(currentTermin.gibBesitzer(), NutzerOrganisationsapp_withNutzerName);
             for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : terminBesitzer_entityToContact.getTokens())
                 buildNotificationAndSend(currentTermin, tokenEntity, type);
 
             for (String nutzerToContact : currentTermin.gibSharedTerminNutzerList()) {
-                Nutzer_entity nutzer_entityToContact = (Nutzer_entity) persistingService.get(nutzerToContact, NutzerOrganisationsapp_withNutzerName);
+                OrganisationsApp_Nutzer_entity nutzer_entityToContact = (OrganisationsApp_Nutzer_entity) persistingService.get(nutzerToContact, NutzerOrganisationsapp_withNutzerName);
                 for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : nutzer_entityToContact.getTokens())
                     buildNotificationAndSend(currentTermin, tokenEntity, type);
             }
         }
     }
 
-    private void buildNotificationAndSend(Termin_FirebaseCrypt termin, Token_FirebaseMessagingOrganisationsApp_entity tokenEntity, Enum type){
+    private void buildNotificationAndSend(FirebaseCrypt_Termin_entity termin, Token_FirebaseMessagingOrganisationsApp_entity tokenEntity, Enum type){
         AndroidNotification androidNotification = AndroidNotification.builder()
                 .setTitle(getTitleString(termin, type))
                 .setBody(getBodyString(termin))
@@ -205,7 +205,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
         e.printStackTrace();
         persistingService.delete(tokenEntity);
         DocumentReference docRef = firestore.collection(FirebaseInitialization.FIRESTORE_ORGANISATIONSAPP_NUTZER_COLLECTION).document(tokenEntity.getNutzer_entity().getFirebaseID());
-        ApiFuture<WriteResult> writeResult = docRef.update(Nutzer_FirebaseCrypt.TOKEN_MESSAGING_LIST, FieldValue.arrayRemove(tokenEntity.getToken_CryptFirebase()));
+        ApiFuture<WriteResult> writeResult = docRef.update(FirebaseCrypt_Nutzer.TOKEN_MESSAGING_LIST, FieldValue.arrayRemove(tokenEntity.getToken_CryptFirebase()));
         try {
             System.out.println("Update time : " + writeResult.get());
         } catch (InterruptedException | ExecutionException interruptedException) {
@@ -213,7 +213,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
         }
     }
 
-    private String getTitleString(Termin_FirebaseCrypt termin, Enum type){
+    private String getTitleString(FirebaseCrypt_Termin_entity termin, Enum type){
         SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
         String terminType;
         if (type == DocumentChange.Type.ADDED) {
@@ -242,7 +242,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
             }
         } else if (type == DocumentChange.Type.MODIFIED) {
             long terminErledigungsTime          = termin.gibErledigungsTime();
-            if (terminErledigungsTime == Termin_FirebaseCrypt.TASK_NOT_DONE)
+            if (terminErledigungsTime == FirebaseCrypt_Termin_entity.TASK_NOT_DONE)
                 terminType = "Aufgabe noch nicht erledigt:";
             else
                 terminType = "Aufgabe erledigt um " +timeFormatter.format(terminErledigungsTime);
@@ -274,7 +274,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
 
         return terminType + " " + termin.gibName() ;
     }
-    private String getBodyString(Termin_FirebaseCrypt termin){
+    private String getBodyString(FirebaseCrypt_Termin_entity termin){
         long terminStartTime                = termin.gibStartTimeInMillis();
         long terminEndTimeOnDay             = termin.gibEndTimeInMillisOnDay();
 

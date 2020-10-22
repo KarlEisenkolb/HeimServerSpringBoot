@@ -25,6 +25,11 @@ html{
     width: 11vw;
 }
 
+.card_sensorchart_width_height{
+    width: 30vw;
+    height: 15vw;
+}
+
 .custom_main_container{
     padding: 1.5vw 1.7vw;
 }

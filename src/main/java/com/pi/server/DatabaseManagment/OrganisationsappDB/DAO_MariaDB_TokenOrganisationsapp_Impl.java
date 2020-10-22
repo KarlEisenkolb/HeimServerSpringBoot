@@ -1,8 +1,7 @@
 package com.pi.server.DatabaseManagment.OrganisationsappDB;
 
 import com.pi.server.DatabaseManagment.DAO_Basic;
-import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
-import com.pi.server.Models.Organisationsapp.Nutzer_entity;
+import com.pi.server.Models.Organisationsapp.OrganisationsApp_Nutzer_entity;
 import com.pi.server.Models.Organisationsapp.Token_FirebaseMessagingOrganisationsApp_entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +45,8 @@ public class DAO_MariaDB_TokenOrganisationsapp_Impl implements DAO_Basic<Token_F
 
     @Override
     public List<Token_FirebaseMessagingOrganisationsApp_entity> getAll() {
-        String queryString = "SELECT a FROM " + Nutzer_entity.TableName + " a";
-        TypedQuery<Nutzer_entity> query = entityManager.createQuery(queryString, Nutzer_entity.class);
+        String queryString = "SELECT a FROM " + OrganisationsApp_Nutzer_entity.TableName + " a";
+        TypedQuery<OrganisationsApp_Nutzer_entity> query = entityManager.createQuery(queryString, OrganisationsApp_Nutzer_entity.class);
         log.info("Nutzer aus Datenbank: {}", queryString);
         //return query.getResultList();
         return null;

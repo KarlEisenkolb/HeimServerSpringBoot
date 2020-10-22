@@ -1,0 +1,210 @@
+<div th:fragment="sensor_visualisation">
+    <div class="card border-secondary mb-3 card_width opacity_and_color" th:id="alertcard" style="position: absolute;bottom: 2vw;right: 3vw;">
+        <div class="card-body">
+            Scheinbar gewöhnliche, verlassene Häuser stehen in den Wäldern von Wünsdorf, rund 50 Kilometer von Berlin entfernt. Es handelt sich um einen getarnten, geschichtsträchtigen Ort: Der Gebäudekomplex war ein wichtiges Kommunikationszentrum der Wehrmacht während des Zweiten Weltkriegs
+        </div>
+    </div>
+
+    <div class="card border-secondary mb-3 card_sensorchart_width_height opacity_and_color" style="position: absolute;bottom: 2vw;right: 15vw;">
+        <canvas id="sensorChart" class="table-opacity_and_color" style="padding: 1vw 1vw;"></canvas>
+        <script th:inline="javascript">
+
+                new Chart(document.getElementById("sensorChart"),{
+                    type: "line",
+                    data: {
+                          "datasets": [
+                             {
+                               "label":"My First Dataset",
+                               "data": /*[[${pm25}]]*/,
+                               "fill":false,
+                               "borderColor":"rgb(2, 117, 216)",
+                               "lineTension":0.1,
+                               yAxisID: 'particle-y-axis'
+                             },{
+                             "label":"Second Data Set",
+                               "data": /*[[${pm10}]]*/,
+                               "fill":false,
+                               "borderColor":"rgb(75, 192, 192)",
+                               "lineTension":0.1,
+                               yAxisID: 'particle-y-axis'
+                             },{
+                             "label":"Gas",
+                               "data": /*[[${iaq}]]*/,
+                               "fill":false,
+                               "borderColor":"rgb(240, 173, 78)",
+                               "lineTension":0.1,
+                               yAxisID: 'gasohm-y-axis'
+                             }
+                          ]
+                         },
+                    options: {
+                        animation: false,
+                        legend: false,
+                        elements: {
+                            point:{
+                                radius: 0
+                            }
+                        },
+                        scales: {
+                            yAxes: [{
+                                id: 'particle-y-axis',
+                                position: 'left',
+                                gridLines: {
+                                    color: "rgb(255,255,255)",
+                                    lineWidth: 0.25
+                                    }
+                                },{
+                                id: 'gasohm-y-axis',
+                                position: 'right'
+                                }
+                            ],
+                            xAxes: [{
+                                type: 'time',
+                                distribution: 'linear',
+                                display: true,
+                                time: {
+                                    displayFormats: {
+                                        day: 'MMM D'
+                                    }
+                                },
+                                gridLines: {
+                                    color: "rgb(255,255,255)",
+                                    lineWidth: 0.25
+                                    },
+                            }]
+                        }
+                    }
+                });
+            </script>
+    </div>
+
+    <div class="card border-secondary mb-3 card_sensorchart_width_height opacity_and_color" style="position: absolute;bottom: 2vw;right: 46vw;">
+        <canvas id="sensorChart2" class="table-opacity_and_color" style="padding: 1vw 1vw;"></canvas>
+        <script th:inline="javascript">
+                var currentweatherlist      = /*[[${currentweatherlist}]]*/;
+                var currentweatherlist_temp = [];
+
+                for (let i=0; i<currentweatherlist.length; i++) {
+                    currentweatherlist_temp[i] = {
+                        x: new Date(currentweatherlist[i].time * 1000),
+                        y: currentweatherlist[i].temp
+                    };
+                }
+
+                new Chart(document.getElementById("sensorChart2"),{
+                    type: "line",
+                    data: {
+                          "datasets": [
+                             {
+                               "label":"Innentemperatur",
+                               "data": /*[[${temp_in}]]*/,
+                               "fill":false,
+                               "borderColor":"rgb(2, 117, 216)",
+                               "lineTension":0.1,
+                               yAxisID: 'temp-y-axis'
+                             },{
+                             "label":"Innenluftfeuchtigkeit",
+                               "data": /*[[${rel_hum}]]*/,
+                               "fill":false,
+                               "borderColor":"rgb(75, 192, 192)",
+                               "lineTension":0.1,
+                               yAxisID: 'humidity-y-axis'
+                             },{
+                             "label":"Außentemperatur",
+                               "data": currentweatherlist_temp,
+                               "fill":false,
+                               "borderColor":"rgb(240, 173, 78)",
+                               "lineTension":0.1,
+                               yAxisID: 'temp-y-axis'
+                             }
+                          ]
+                         },
+                    options: {
+                        animation: false,
+                        legend: false,
+                        elements: {
+                            point:{
+                                radius: 0
+                            }
+                        },
+                        scales: {
+                            yAxes: [{
+                                id: 'temp-y-axis',
+                                position: 'left',
+                                gridLines: {
+                                    color: "rgb(255,255,255)",
+                                    lineWidth: 0.25
+                                    }
+                                },{
+                                id: 'humidity-y-axis',
+                                position: 'right'
+                                }
+                            ],
+                            xAxes: [{
+                                type: 'time',
+                                distribution: 'linear',
+                                display: true,
+                                time: {
+                                    displayFormats: {
+                                        day: 'MMM D'
+                                    }
+                                },
+                                gridLines: {
+                                    color: "rgb(255,255,255)",
+                                    lineWidth: 0.25
+                                    },
+                            }]
+                        }
+                    }
+                });
+            </script>
+    </div>
+    <div class="card border-secondary mb-3 opacity_and_color" th:id="alertcard" style="position: absolute;bottom: 2vw;right: 77vw;">
+        <div class="card-body">
+            <table class="table table-dark table-opacity_and_color">
+                <tbody>
+                <tr>
+                    <th></th>
+                    <th>Temp</th>
+                    <th>Hum</th>
+                    <th>Gas</th>
+                    <th>PM2,5</th>
+                    <th>PM10</th>
+                </tr>
+                <tr>
+                    <th>Bibliothek</th>
+                    <td>23,6°</td>
+                    <td>23%</td>
+                    <td>1,5</td>
+                    <td>4601,7&mu;g/l</td>
+                    <td>7&mu;g/l</td>
+                </tr>
+                <tr>
+                    <th>Küche</th>
+                    <td>23,6°</td>
+                    <td>23%</td>
+                    <td>12,5</td>
+                    <td>1460,7&mu;g/l</td>
+                    <td>7&mu;g/l</td>
+                </tr>
+                <tr>
+                    <th>Bad</th>
+                    <td>23,6°</td>
+                    <td>23%</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <th>Keller</th>
+                    <td>23,6°</td>
+                    <td>23%</td>
+                    <td>12,5</td>
+                    <td>1460,7&mu;g/l</td>
+                    <td>7&mu;g/l</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

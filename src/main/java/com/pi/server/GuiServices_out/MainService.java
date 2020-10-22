@@ -1,9 +1,9 @@
 package com.pi.server.GuiServices_out;
 
 import com.pi.server.DatabaseManagment.PersistingService;
-import com.pi.server.Models.Organisationsapp.DayMitTerminen_mav;
-import com.pi.server.Models.Organisationsapp.TerminDecrypted_mav;
-import com.pi.server.Models.Organisationsapp.Termin_FirebaseCrypt;
+import com.pi.server.Models.Organisationsapp.Mav_DayMitTerminen;
+import com.pi.server.Models.Organisationsapp.Mav_TerminDecrypted;
+import com.pi.server.Models.Organisationsapp.FirebaseCrypt_Termin_entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
@@ -58,35 +58,35 @@ public class MainService {
 
     public List getTermineForDaysToDisplay(int anzahl_Tageskacheln){
         ZonedDateTime todayDate = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
-        List<DayMitTerminen_mav> daylist = new ArrayList<>();
-        daylist.add(new DayMitTerminen_mav(todayDate.toInstant().toEpochMilli()));
+        List<Mav_DayMitTerminen> daylist = new ArrayList<>();
+        daylist.add(new Mav_DayMitTerminen(todayDate.toInstant().toEpochMilli()));
         for(int i = 1; i <= anzahl_Tageskacheln; i++)
-            daylist.add(new DayMitTerminen_mav(todayDate.plus(i, ChronoUnit.DAYS).toInstant().toEpochMilli()));
+            daylist.add(new Mav_DayMitTerminen(todayDate.plus(i, ChronoUnit.DAYS).toInstant().toEpochMilli()));
 
         setTermineInDayList(daylist);
         return daylist;
     }
 
-    private void setTermineInDayList(List<DayMitTerminen_mav> daylist){
+    private void setTermineInDayList(List<Mav_DayMitTerminen> daylist){
         long lastDayInDayListPlusOneDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(daylist.get(daylist.size()-1).getTime_utc()), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli(); // der Endzeitpunkt soll auch Termin beeinhalten die nach 0:00 des Endtages starten
-        List<Termin_FirebaseCrypt> completeTerminList = (List<Termin_FirebaseCrypt>)(Object) persistingService.getAllTermineInTimeframe(daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
+        List<FirebaseCrypt_Termin_entity> completeTerminList = (List<FirebaseCrypt_Termin_entity>)(Object) persistingService.getAllInTimeframe(PersistingService.NutzerOrganisationsapp_giveTermineInTimeframe, daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
 
         //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
         //for(Termin_FirebaseCrypt termin : completeTerminList) //debugging listoutput
             //System.out.println(termin.gibName() +"|"+ sdf.format(termin.gibStartTimeInMillis()));
 
         long todayInMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); // today in Millis UTC
-        for (DayMitTerminen_mav day : daylist){
+        for (Mav_DayMitTerminen day : daylist){
             long currentDayInMillis = day.getTime_utc();
             long nextDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentDayInMillis), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli();
 
-            for (Termin_FirebaseCrypt termin :completeTerminList) {
+            for (FirebaseCrypt_Termin_entity termin :completeTerminList) {
                 if (currentDayInMillis <= termin.gibStartTimeInMillis() && nextDayInMillis > termin.gibStartTimeInMillis()){
                     day.add_termin(prepareTerminToDisplay(termin, day));
-                }else if(termin.gibWiederholungsIntervall() != Termin_FirebaseCrypt.REPETITION_SINGLE && termin.gibStartTimeInMillis() == termin.gibEndTimeInMillis()){
+                }else if(termin.gibWiederholungsIntervall() != FirebaseCrypt_Termin_entity.REPETITION_SINGLE && termin.gibStartTimeInMillis() == termin.gibEndTimeInMillis()){
                     addingRepetitionTerminHandling(day, termin);
-                }else if(termin.gibType() == Termin_FirebaseCrypt.TYPE_AUFGABE){
-                    if (todayInMillis == currentDayInMillis && termin.gibStartTimeInMillis() <= currentDayInMillis && termin.gibErledigungsTime() == Termin_FirebaseCrypt.TASK_NOT_DONE)
+                }else if(termin.gibType() == FirebaseCrypt_Termin_entity.TYPE_AUFGABE){
+                    if (todayInMillis == currentDayInMillis && termin.gibStartTimeInMillis() <= currentDayInMillis && termin.gibErledigungsTime() == FirebaseCrypt_Termin_entity.TASK_NOT_DONE)
                         day.add_termin(prepareTerminToDisplay(termin, day));
                     else if(currentDayInMillis <= termin.gibErledigungsTime() && nextDayInMillis > termin.gibErledigungsTime())
                         day.add_termin(prepareTerminToDisplay(termin, day));
@@ -95,25 +95,25 @@ public class MainService {
         }
     }
 
-    private void addingRepetitionTerminHandling(DayMitTerminen_mav day, Termin_FirebaseCrypt termin) {
+    private void addingRepetitionTerminHandling(Mav_DayMitTerminen day, FirebaseCrypt_Termin_entity termin) {
         ZonedDateTime zdt_currentDay = ZonedDateTime.ofInstant(Instant.ofEpochMilli(day.getTime_utc()), ZoneId.systemDefault());
         ZonedDateTime zdt_currentTermin = ZonedDateTime.ofInstant(Instant.ofEpochMilli(termin.gibStartTimeInMillis()), ZoneId.systemDefault());
 
         switch ((int) termin.gibWiederholungsIntervall()) {
-            case (int) Termin_FirebaseCrypt.REPETITION_DAY:
+            case (int) FirebaseCrypt_Termin_entity.REPETITION_DAY:
                 day.add_termin(prepareTerminToDisplay(termin, day));
                 break;
-            case (int) Termin_FirebaseCrypt.REPETITION_WEEK:
+            case (int) FirebaseCrypt_Termin_entity.REPETITION_WEEK:
                 if (zdt_currentTermin.getDayOfWeek() == zdt_currentDay.getDayOfWeek()) {
                     day.add_termin(prepareTerminToDisplay(termin, day));
                 }
                 break;
-            case (int) Termin_FirebaseCrypt.REPETITION_MONTH:
+            case (int) FirebaseCrypt_Termin_entity.REPETITION_MONTH:
                 if (zdt_currentTermin.getDayOfMonth() == zdt_currentDay.getDayOfMonth()) {
                     day.add_termin(prepareTerminToDisplay(termin, day));
                 }
                 break;
-            case (int) Termin_FirebaseCrypt.REPETITION_YEAR:
+            case (int) FirebaseCrypt_Termin_entity.REPETITION_YEAR:
                 if (zdt_currentTermin.getDayOfMonth() == zdt_currentDay.getDayOfMonth() && zdt_currentTermin.getMonth() == zdt_currentDay.getMonth()) {
                     day.add_termin(prepareTerminToDisplay(termin, day));
                 }
@@ -121,10 +121,10 @@ public class MainService {
         }
     }
 
-    private TerminDecrypted_mav prepareTerminToDisplay(Termin_FirebaseCrypt termin, DayMitTerminen_mav currentDay){
+    private Mav_TerminDecrypted prepareTerminToDisplay(FirebaseCrypt_Termin_entity termin, Mav_DayMitTerminen currentDay){
         long currentDayInMillis = currentDay.getTime_utc();
 
-        return new TerminDecrypted_mav(
+        return new Mav_TerminDecrypted(
                 getUhrzeitString(termin),
                 getNameString(termin, currentDayInMillis),
                 termin.gibDescription(),
@@ -133,9 +133,9 @@ public class MainService {
         );
     }
 
-    private String getNameString(Termin_FirebaseCrypt termin, long currentDayInMillis) {
+    private String getNameString(FirebaseCrypt_Termin_entity termin, long currentDayInMillis) {
         String name;
-        if (termin.gibType() == Termin_FirebaseCrypt.TYPE_GEBURTSTAG){
+        if (termin.gibType() == FirebaseCrypt_Termin_entity.TYPE_GEBURTSTAG){
             LocalDate currentGeburtstag = Instant.ofEpochMilli(currentDayInMillis).atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate geburtstag        = LocalDate.of((int) termin.gibGeburtsjahr(), currentGeburtstag.getMonth(), currentGeburtstag.getDayOfMonth());
             Period period = Period.between(geburtstag, currentGeburtstag);
@@ -145,7 +145,7 @@ public class MainService {
         return name;
     }
 
-    private String getUhrzeitString(Termin_FirebaseCrypt termin) {
+    private String getUhrzeitString(FirebaseCrypt_Termin_entity termin) {
         long terminStartTime                = termin.gibStartTimeInMillis();
         long terminEndTimeOnDay             = termin.gibEndTimeInMillisOnDay();
 

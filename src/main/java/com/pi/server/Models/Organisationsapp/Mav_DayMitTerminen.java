@@ -3,18 +3,18 @@ package com.pi.server.Models.Organisationsapp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DayMitTerminen_mav {
+public class Mav_DayMitTerminen {
 
     private long time_utc;
-    private List<TerminDecrypted_mav> terminlist = new ArrayList<>();
+    private List<Mav_TerminDecrypted> terminlist = new ArrayList<>();
 
-    public DayMitTerminen_mav(){}
+    public Mav_DayMitTerminen(){}
 
-    public DayMitTerminen_mav(long time_utc){
+    public Mav_DayMitTerminen(long time_utc){
         this.time_utc = time_utc;
     }
 
-    public void add_termin(TerminDecrypted_mav termin){
+    public void add_termin(Mav_TerminDecrypted termin){
         terminlist.add(termin);
     }
 
@@ -26,11 +26,11 @@ public class DayMitTerminen_mav {
         this.time_utc = time_utc;
     }
 
-    public List<TerminDecrypted_mav> getTerminlist() {
+    public List<Mav_TerminDecrypted> getTerminlist() {
         return terminlist;
     }
 
-    public void setTerminlist(List<TerminDecrypted_mav> terminlist) {
+    public void setTerminlist(List<Mav_TerminDecrypted> terminlist) {
         this.terminlist = terminlist;
     }
 }

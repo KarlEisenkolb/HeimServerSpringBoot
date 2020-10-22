@@ -14,7 +14,7 @@ public class Token_FirebaseMessagingOrganisationsApp_entity {
 
     @ManyToOne
     @JoinColumn(name = "firebaseID")
-    private Nutzer_entity nutzer_entity;
+    private OrganisationsApp_Nutzer_entity nutzer_entity;
 
     @Column
     private String token;
@@ -27,7 +27,7 @@ public class Token_FirebaseMessagingOrganisationsApp_entity {
 
     public Token_FirebaseMessagingOrganisationsApp_entity(){}
 
-    public Token_FirebaseMessagingOrganisationsApp_entity(String token, String token_CryptFirebase, Nutzer_entity nutzer_entity){
+    public Token_FirebaseMessagingOrganisationsApp_entity(String token, String token_CryptFirebase, OrganisationsApp_Nutzer_entity nutzer_entity){
         this.nutzer_entity = nutzer_entity;
         this.token = token;
         this.token_crypt_firebase = token_CryptFirebase;
@@ -42,11 +42,11 @@ public class Token_FirebaseMessagingOrganisationsApp_entity {
         this.id = id;
     }
 
-    public Nutzer_entity getNutzer_entity() {
+    public OrganisationsApp_Nutzer_entity getNutzer_entity() {
         return nutzer_entity;
     }
 
-    public void setNutzer_entity(Nutzer_entity nutzer_entity) {
+    public void setNutzer_entity(OrganisationsApp_Nutzer_entity nutzer_entity) {
         this.nutzer_entity = nutzer_entity;
     }
 

@@ -8,9 +8,9 @@ import java.util.List;
 
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
-@Entity(name = Nutzer_entity.TableName)
-@Table(name = Nutzer_entity.TableName)
-public class Nutzer_entity {
+@Entity(name = OrganisationsApp_Nutzer_entity.TableName)
+@Table(name = OrganisationsApp_Nutzer_entity.TableName)
+public class OrganisationsApp_Nutzer_entity {
 
     public final static String TableName = "organisationsapp_nutzer";
 
@@ -25,9 +25,9 @@ public class Nutzer_entity {
     @OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="nutzer_entity")
     private List<Token_FirebaseMessagingOrganisationsApp_entity> tokens = new ArrayList<>();
 
-    public Nutzer_entity(){}
+    public OrganisationsApp_Nutzer_entity(){}
 
-    public Nutzer_entity(String firebaseID, String name, List<String> tokenListCrypted){
+    public OrganisationsApp_Nutzer_entity(String firebaseID, String name, List<String> tokenListCrypted){
         Crypt crypt = new Crypt(CRYPT_USE_DEFAULT_KEY);
         this.firebaseID = firebaseID;
         this.name = name;
