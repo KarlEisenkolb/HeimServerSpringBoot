@@ -1,6 +1,91 @@
 <div th:fragment="sensor_visualisation">
     <div class="card border-secondary mb-3 card_width opacity_and_color" th:id="alertcard" style="position: absolute;bottom: 2vw;right: 3vw;">
         <div class="card-body">
+            <canvas id="absTempChart" height="150" class="table-opacity_and_color" style="padding: 0.2vw 0.6vw 0px 0.6vw;"></canvas>
+            <script th:inline="javascript">
+            var hourlylist  = /*[[${hourlyweatherlist}]]*/;
+            var time_string = [];
+            var temp_hourly = [];
+            var pop_hourly  = [];
+
+
+            for (let i=0; i<hourlylist.length; i++) {
+                time_string[i] = hourlylist[i].time_string;
+                temp_hourly[i] = hourlylist[i].temp;
+                pop_hourly[i]  = hourlylist[i].pop;
+            }
+
+            new Chart(document.getElementById("absTempChart"),{
+                type: "line",
+                data: {
+                    labels: time_string,
+                    datasets: [{
+                        label: 'Temp.',
+                        backgroundColor: "rgba(2, 117, 216, 0.3)",
+                        data: temp_hourly,
+                        fill: false,
+                        borderColor: "rgb(2, 117, 216)",
+                        lineTension: 0,
+                        yAxisID: 'left-temp'
+                    },{
+                        label: 'Regen',
+                        backgroundColor: "rgba(255, 26, 0, 0.3)",
+                        data: pop_hourly,
+                        fill: false,
+                        borderColor: "rgb(255, 26, 0)",
+                        lineTension: 0,
+                        yAxisID: 'right-pop'
+                    }]
+                },
+                options: {
+                    animation: false,
+                    legend: false,
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    scales: {
+                        yAxes: [{
+                            id: 'left-temp',
+                            type: 'linear',
+                            position: 'left',
+                            ticks: {
+                                maxTicksLimit: 5,
+                                callback: function(value, index, values){
+                                    return value + '°'
+                                }
+                            },
+                            gridLines: {
+                                color: "rgb(255,255,255)",
+                                lineWidth: 0.25
+                                }
+                        }, {
+                            id: 'right-pop',
+                            type: 'linear',
+                            position: 'right',
+                            ticks: {
+                                suggestedMin: 0,
+                                suggestedMax: 100,
+                                maxTicksLimit: 5,
+                                callback: function(value, index, values){
+                                    return value + '%'
+                                }
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit: 5,
+                            },
+                            gridLines: {
+                                color: "rgb(255,255,255)",
+                                lineWidth: 0.25
+                                },
+                        }]
+                    }
+                }
+            });
+        </script>
             Scheinbar gewöhnliche, verlassene Häuser stehen in den Wäldern von Wünsdorf, rund 50 Kilometer von Berlin entfernt. Es handelt sich um einen getarnten, geschichtsträchtigen Ort: Der Gebäudekomplex war ein wichtiges Kommunikationszentrum der Wehrmacht während des Zweiten Weltkriegs
         </div>
     </div>
@@ -14,32 +99,33 @@
                     data: {
                           "datasets": [
                              {
-                               "label":"My First Dataset",
+                               "label":"PM2,5 [\u03BCg/m\u00B3]",
                                "data": /*[[${pm25}]]*/,
                                "fill":false,
                                "borderColor":"rgb(2, 117, 216)",
                                "lineTension":0.1,
                                yAxisID: 'particle-y-axis'
                              },{
-                             "label":"Second Data Set",
+                             "label":"PM10 [\u03BCg/m\u00B3]",
                                "data": /*[[${pm10}]]*/,
                                "fill":false,
-                               "borderColor":"rgb(75, 192, 192)",
+                               "borderDash": [5, 5],
+                               "borderWidth": 4,
+                               "borderColor":"rgb(2, 117, 216)",
                                "lineTension":0.1,
                                yAxisID: 'particle-y-axis'
                              },{
-                             "label":"Gas",
+                             "label":"IAQ [0-500]",
                                "data": /*[[${iaq}]]*/,
                                "fill":false,
                                "borderColor":"rgb(240, 173, 78)",
                                "lineTension":0.1,
-                               yAxisID: 'gasohm-y-axis'
+                               yAxisID: 'iaq-y-axis'
                              }
                           ]
                          },
                     options: {
                         animation: false,
-                        legend: false,
                         elements: {
                             point:{
                                 radius: 0
@@ -49,12 +135,17 @@
                             yAxes: [{
                                 id: 'particle-y-axis',
                                 position: 'left',
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return value + '\u03BCg/m\u00B3';
+                                    }
+                                },
                                 gridLines: {
                                     color: "rgb(255,255,255)",
                                     lineWidth: 0.25
                                     }
                                 },{
-                                id: 'gasohm-y-axis',
+                                id: 'iaq-y-axis',
                                 position: 'right'
                                 }
                             ],
@@ -81,39 +172,32 @@
     <div class="card border-secondary mb-3 card_sensorchart_width_height opacity_and_color" style="position: absolute;bottom: 2vw;right: 46vw;">
         <canvas id="sensorChart2" class="table-opacity_and_color" style="padding: 1vw 1vw;"></canvas>
         <script th:inline="javascript">
-                var currentweatherlist      = /*[[${currentweatherlist}]]*/;
-                var currentweatherlist_temp = [];
-
-                for (let i=0; i<currentweatherlist.length; i++) {
-                    currentweatherlist_temp[i] = {
-                        x: new Date(currentweatherlist[i].time * 1000),
-                        y: currentweatherlist[i].temp
-                    };
-                }
 
                 new Chart(document.getElementById("sensorChart2"),{
                     type: "line",
                     data: {
                           "datasets": [
                              {
-                               "label":"Innentemperatur",
+                               "label":"Innen [°C]",
                                "data": /*[[${temp_in}]]*/,
                                "fill":false,
                                "borderColor":"rgb(2, 117, 216)",
                                "lineTension":0.1,
                                yAxisID: 'temp-y-axis'
                              },{
-                             "label":"Innenluftfeuchtigkeit",
+                             "label":"Innen [%RH]",
                                "data": /*[[${rel_hum}]]*/,
                                "fill":false,
-                               "borderColor":"rgb(75, 192, 192)",
+                               "borderColor":"rgb(8,144,0)",
                                "lineTension":0.1,
                                yAxisID: 'humidity-y-axis'
                              },{
-                             "label":"Außentemperatur",
-                               "data": currentweatherlist_temp,
+                             "label":"Außen [°C]",
+                               "data": /*[[${currentweather_templist}]]*/,
                                "fill":false,
-                               "borderColor":"rgb(240, 173, 78)",
+                               "borderDash": [5, 5],
+                               "borderWidth": 4,
+                               "borderColor":"rgb(2, 117, 216)",
                                "lineTension":0.1,
                                yAxisID: 'temp-y-axis'
                              }
@@ -121,7 +205,6 @@
                          },
                     options: {
                         animation: false,
-                        legend: false,
                         elements: {
                             point:{
                                 radius: 0
@@ -131,13 +214,23 @@
                             yAxes: [{
                                 id: 'temp-y-axis',
                                 position: 'left',
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return value + '°C';
+                                    }
+                                },
                                 gridLines: {
                                     color: "rgb(255,255,255)",
                                     lineWidth: 0.25
                                     }
                                 },{
                                 id: 'humidity-y-axis',
-                                position: 'right'
+                                position: 'right',
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return value + '%';
+                                    }
+                                }
                                 }
                             ],
                             xAxes: [{

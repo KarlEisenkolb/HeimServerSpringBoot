@@ -25,10 +25,20 @@ public class DAO_MariaDB_DailyWeather_Impl implements DAO_Basic<WeatherForecast_
     }
 
     @Override
+    public WeatherForecast_daily_entity getLastItem() {
+        return null;
+    }
+
+    @Override
     public List<WeatherForecast_daily_entity> getAll() {
         String queryString = "SELECT w FROM " + WeatherForecast_daily_entity.TableName +" w ORDER BY w.time ASC";
         TypedQuery<WeatherForecast_daily_entity> query = entityManager.createQuery(queryString, WeatherForecast_daily_entity.class);
         return query.getResultList();
+    }
+
+    @Override
+    public List<WeatherForecast_daily_entity> getAll_withStartAndEndTime(long startTime, long endTime) {
+        return null;
     }
 
     @Transactional

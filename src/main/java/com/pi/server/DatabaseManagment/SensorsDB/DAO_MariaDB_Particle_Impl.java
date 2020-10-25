@@ -13,7 +13,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
-public class DAO_MariaDB_Particle_Impl implements DAO_Basic<Sensor_Particle_entity>, DAO_Sensors<Sensor_Particle_entity> {
+public class DAO_MariaDB_Particle_Impl implements DAO_Basic<Sensor_Particle_entity> {
 
     private final Logger log = LoggerFactory.getLogger(DAO_MariaDB_Particle_Impl.class);
 
@@ -27,6 +27,11 @@ public class DAO_MariaDB_Particle_Impl implements DAO_Basic<Sensor_Particle_enti
 
     @Override
     public Sensor_Particle_entity get(String id) {
+        return null;
+    }
+
+    @Override
+    public Sensor_Particle_entity getLastItem() {
         return null;
     }
 

@@ -39,6 +39,11 @@ public class DAO_MariaDB_TokenOrganisationsapp_Impl implements DAO_Basic<Token_F
     }
 
     @Override
+    public Token_FirebaseMessagingOrganisationsApp_entity getLastItem() {
+        return null;
+    }
+
+    @Override
     public Token_FirebaseMessagingOrganisationsApp_entity get(long id) {
         return null;
     }
@@ -49,6 +54,11 @@ public class DAO_MariaDB_TokenOrganisationsapp_Impl implements DAO_Basic<Token_F
         TypedQuery<OrganisationsApp_Nutzer_entity> query = entityManager.createQuery(queryString, OrganisationsApp_Nutzer_entity.class);
         log.info("Nutzer aus Datenbank: {}", queryString);
         //return query.getResultList();
+        return null;
+    }
+
+    @Override
+    public List<Token_FirebaseMessagingOrganisationsApp_entity> getAll_withStartAndEndTime(long startTime, long endTime) {
         return null;
     }
 

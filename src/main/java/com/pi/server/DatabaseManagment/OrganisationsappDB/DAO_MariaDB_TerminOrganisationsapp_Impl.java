@@ -31,6 +31,11 @@ public class DAO_MariaDB_TerminOrganisationsapp_Impl implements DAO_Basic<Fireba
     }
 
     @Override
+    public FirebaseCrypt_Termin_entity getLastItem() {
+        return null;
+    }
+
+    @Override
     public FirebaseCrypt_Termin_entity get_withNutzerName(String name) {
         return null;
     }

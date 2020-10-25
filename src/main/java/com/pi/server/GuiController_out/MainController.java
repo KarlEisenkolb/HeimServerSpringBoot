@@ -3,6 +3,7 @@ package com.pi.server.GuiController_out;
 import com.pi.server.GuiServices_out.MainService;
 import com.pi.server.GuiServices_out.SensorService;
 import com.pi.server.GuiServices_out.ServerDataStatusService;
+import com.pi.server.Models.OpenWeather.Weather_current_entity;
 import com.pi.server.Models.SensorModels.Mav_XYPlotData;
 import com.pi.server.Models.SensorModels.Sensor_BME680_entity;
 import com.pi.server.Models.SensorModels.Sensor_Particle_entity;
@@ -76,10 +77,7 @@ public class MainController {
     }
 
     private void weatherData(ModelAndView mav) {
-
-        List weatherList = mainService.getCurrentWeatherContent();
-        mav.addObject("latestWeather", weatherList.get(0));
-        mav.addObject("currentweatherlist", weatherList);
+        mav.addObject("latestWeather", mainService.getLatestCurrentWeather());
 
         List weatherHourlyList = mainService.getWeatherHourlyForecastContent();
         mav.addObject("hourlyweatherlist", weatherHourlyList);
@@ -117,5 +115,13 @@ public class MainController {
         }
         mav.addObject("pm25", pm25);
         mav.addObject("pm10", pm10);
+
+        List currentWeatherDataList = sensorService.getCurrentWeatherData();
+        List<Mav_XYPlotData> currentweather_templist   = new ArrayList<>();
+
+        for(Weather_current_entity currentWeather : (List<Weather_current_entity>)(List<?>) currentWeatherDataList){
+            currentweather_templist.add(new Mav_XYPlotData(currentWeather.getRequestTimestamp(), currentWeather.getTemp()));
+        }
+        mav.addObject("currentweather_templist", currentweather_templist);
     }
 }

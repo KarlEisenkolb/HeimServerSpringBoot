@@ -12,7 +12,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
-public class DAO_MariaDB_BME680_Impl implements DAO_Basic<Sensor_BME680_entity>, DAO_Sensors<Sensor_BME680_entity>  {
+public class DAO_MariaDB_BME680_Impl implements DAO_Basic<Sensor_BME680_entity>  {
 
     private final Logger log = LoggerFactory.getLogger(DAO_MariaDB_BME680_Impl.class);
 
@@ -27,6 +27,11 @@ public class DAO_MariaDB_BME680_Impl implements DAO_Basic<Sensor_BME680_entity>,
 
     @Override
     public Sensor_BME680_entity get(String id) {
+        return null;
+    }
+
+    @Override
+    public Sensor_BME680_entity getLastItem() {
         return null;
     }
 

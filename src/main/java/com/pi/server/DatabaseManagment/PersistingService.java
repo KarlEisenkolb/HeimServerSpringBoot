@@ -2,7 +2,6 @@ package com.pi.server.DatabaseManagment;
 
 import com.pi.server.DatabaseManagment.OpenWeatherDB.DAO_OpenWeather;
 import com.pi.server.DatabaseManagment.OrganisationsappDB.DAO_Organisationsapp;
-import com.pi.server.DatabaseManagment.SensorsDB.DAO_Sensors;
 import com.pi.server.Models.OpenWeather.WeatherForecast_daily_entity;
 import com.pi.server.Models.OpenWeather.WeatherForecast_hourly_entity;
 import com.pi.server.Models.OpenWeather.Weather_current_entity;
@@ -65,12 +64,12 @@ public class PersistingService {
 
     @Autowired
     @Qualifier("DAO_MariaDB_BME680_Impl")
-    private DAO_Sensors dao_bme680;
+    private DAO_Basic dao_bme680;
     public final static int bme680_data = 8;
 
     @Autowired
     @Qualifier("DAO_MariaDB_Particle_Impl")
-    private DAO_Sensors dao_particle;
+    private DAO_Basic dao_particle;
     public final static int particle_data = 9;
 
     public void save (Object obj){
@@ -93,6 +92,15 @@ public class PersistingService {
             System.out.println(LOG_TAG + " No known Object to save found!");
     }
 
+    public Object getLastItem(int requestedType){
+        if (requestedType == CurrentWeather)
+            return dao_current.getLastItem();
+        else{
+            System.out.println(LOG_TAG + " No known Object to get from Database requested");
+            return null;
+        }
+    }
+
     public Object get(String id, int requestedType){
         if (requestedType == CurrentWeather)
             return dao_current.get(id);
@@ -111,8 +119,10 @@ public class PersistingService {
     }
 
     public List<Object> getAllInTimeframe(int requestedType, long startTime, long endTime){
-        if (requestedType == NutzerOrganisationsapp_giveTermineInTimeframe)
-            return dao_terminOrganisationsapp_second.getAll_withStartAndEndTime(startTime, endTime);
+        if (requestedType == NutzerOrganisationsapp_Termin)
+            return dao_terminOrganisationsapp.getAll_withStartAndEndTime(startTime, endTime);
+        else if (requestedType == CurrentWeather)
+            return dao_current.getAll_withStartAndEndTime(startTime, endTime);
         else if (requestedType == bme680_data)
             return dao_bme680.getAll_withStartAndEndTime(startTime, endTime);
         else if (requestedType == particle_data)

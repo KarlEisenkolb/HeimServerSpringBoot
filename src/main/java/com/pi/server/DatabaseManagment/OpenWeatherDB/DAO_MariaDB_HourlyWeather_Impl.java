@@ -26,10 +26,20 @@ public class DAO_MariaDB_HourlyWeather_Impl implements DAO_Basic<WeatherForecast
     }
 
     @Override
+    public WeatherForecast_hourly_entity getLastItem() {
+        return null;
+    }
+
+    @Override
     public List<WeatherForecast_hourly_entity> getAll() {
         String queryString = "SELECT w FROM " + WeatherForecast_hourly_entity.TableName +" w ORDER BY w.time ASC";
         TypedQuery<WeatherForecast_hourly_entity> query = entityManager.createQuery(queryString, WeatherForecast_hourly_entity.class);
         return query.getResultList();
+    }
+
+    @Override
+    public List<WeatherForecast_hourly_entity> getAll_withStartAndEndTime(long startTime, long endTime) {
+        return null;
     }
 
     @Transactional

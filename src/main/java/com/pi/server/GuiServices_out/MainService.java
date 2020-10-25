@@ -44,8 +44,8 @@ public class MainService {
         return dateList;
     }
 
-    public List getCurrentWeatherContent() {
-        return persistingService.getAll(PersistingService.CurrentWeather);
+    public Object getLatestCurrentWeather() {
+        return persistingService.getLastItem(PersistingService.CurrentWeather);
     }
 
     public List getWeatherHourlyForecastContent(){
@@ -69,7 +69,7 @@ public class MainService {
 
     private void setTermineInDayList(List<Mav_DayMitTerminen> daylist){
         long lastDayInDayListPlusOneDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(daylist.get(daylist.size()-1).getTime_utc()), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli(); // der Endzeitpunkt soll auch Termin beeinhalten die nach 0:00 des Endtages starten
-        List<FirebaseCrypt_Termin_entity> completeTerminList = (List<FirebaseCrypt_Termin_entity>)(Object) persistingService.getAllInTimeframe(PersistingService.NutzerOrganisationsapp_giveTermineInTimeframe, daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
+        List<FirebaseCrypt_Termin_entity> completeTerminList = (List<FirebaseCrypt_Termin_entity>)(Object) persistingService.getAllInTimeframe(PersistingService.NutzerOrganisationsapp_Termin, daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
 
         //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
         //for(Termin_FirebaseCrypt termin : completeTerminList) //debugging listoutput

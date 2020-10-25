@@ -25,4 +25,9 @@ public class SensorService {
         long currentTimeInMillis = System.currentTimeMillis();
         return persistingService.getAllInTimeframe(PersistingService.particle_data, currentTimeInMillis-timeIntervall, currentTimeInMillis);
     }
+
+    public List getCurrentWeatherData(){
+        long currentTimeInMillis = System.currentTimeMillis();
+        return persistingService.getAllInTimeframe(PersistingService.CurrentWeather, currentTimeInMillis-timeIntervall, currentTimeInMillis);
+    }
 }

@@ -38,6 +38,11 @@ public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<Organi
     }
 
     @Override
+    public OrganisationsApp_Nutzer_entity getLastItem() {
+        return null;
+    }
+
+    @Override
     public OrganisationsApp_Nutzer_entity get_withNutzerName(String name){
         TypedQuery<OrganisationsApp_Nutzer_entity> q = entityManager.createQuery("SELECT a FROM " + OrganisationsApp_Nutzer_entity.TableName + " a WHERE a.name = :nameID", OrganisationsApp_Nutzer_entity.class);
         q.setParameter("nameID", name);
