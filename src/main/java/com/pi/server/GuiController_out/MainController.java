@@ -40,11 +40,13 @@ public class MainController {
     @Value("${server.ip}")
     private String serverIp;
     private String WEBSITE_GET_DATA_STATUS_URL;
+    private String WEBSITE_UPDATE_PLOT_DATA_URL;
 
     @EventListener(ApplicationReadyEvent.class)
     public void getServerDataUrlAfterServerStart(){
-            WEBSITE_GET_DATA_STATUS_URL = "http://" + serverIp + ":" + serverPort + "/data_status";
-            System.out.println(WEBSITE_GET_DATA_STATUS_URL);
+        WEBSITE_GET_DATA_STATUS_URL = "http://" + serverIp + ":" + serverPort + "/data_status";
+        WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
+        System.out.println(WEBSITE_GET_DATA_STATUS_URL);
     }
 
     @RequestMapping("/")
@@ -58,15 +60,21 @@ public class MainController {
         return mav;
     }
 
-    private void basicData(ModelAndView mav) {
-        mav.addObject("website_get_data_status_url", WEBSITE_GET_DATA_STATUS_URL);
-        mav.addObject("time_and_date_string_long", mainService.getTimeAndDateString(mainService.DATE_LONG));
-        mav.addObject("time_and_date_string_short", mainService.getTimeAndDateString(mainService.DATE_SHORT));
-    }
-
     @RequestMapping("/data_status")
     public String checkForNewData(){
         return serverDataStatusService.getServerStatus();
+    }
+
+    @RequestMapping("/update_plot_data")
+    public Object updatePlotData(){
+        return sensorService.getLatestSensorDataForGuiUpdate();
+    }
+
+    private void basicData(ModelAndView mav) {
+        mav.addObject("website_get_data_status_url", WEBSITE_GET_DATA_STATUS_URL);
+        mav.addObject("website_update_plot_data_url", WEBSITE_UPDATE_PLOT_DATA_URL);
+        mav.addObject("time_and_date_string_long", mainService.getTimeAndDateString(mainService.DATE_LONG));
+        mav.addObject("time_and_date_string_short", mainService.getTimeAndDateString(mainService.DATE_SHORT));
     }
 
     private void organisationsappData(ModelAndView mav) {

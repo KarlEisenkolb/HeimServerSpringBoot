@@ -32,7 +32,9 @@ public class DAO_MariaDB_Particle_Impl implements DAO_Basic<Sensor_Particle_enti
 
     @Override
     public Sensor_Particle_entity getLastItem() {
-        return null;
+        String queryString = "SELECT w FROM " + Sensor_Particle_entity.TableName +" w ORDER BY w.id DESC";
+        TypedQuery<Sensor_Particle_entity> query = entityManager.createQuery(queryString, Sensor_Particle_entity.class);
+        return query.setMaxResults(1).getSingleResult();
     }
 
     @Override

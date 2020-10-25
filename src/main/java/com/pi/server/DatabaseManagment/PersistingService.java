@@ -95,6 +95,10 @@ public class PersistingService {
     public Object getLastItem(int requestedType){
         if (requestedType == CurrentWeather)
             return dao_current.getLastItem();
+        else if (requestedType == bme680_data)
+            return dao_bme680.getLastItem();
+        else if (requestedType == particle_data)
+            return dao_particle.getLastItem();
         else{
             System.out.println(LOG_TAG + " No known Object to get from Database requested");
             return null;

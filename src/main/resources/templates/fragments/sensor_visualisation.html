@@ -94,7 +94,7 @@
         <canvas id="sensorChart" class="table-opacity_and_color" style="padding: 1vw 1vw;"></canvas>
         <script th:inline="javascript">
 
-                new Chart(document.getElementById("sensorChart"),{
+                var particleChart = new Chart(document.getElementById("sensorChart"),{
                     type: "line",
                     data: {
                           "datasets": [
@@ -173,7 +173,7 @@
         <canvas id="sensorChart2" class="table-opacity_and_color" style="padding: 1vw 1vw;"></canvas>
         <script th:inline="javascript">
 
-                new Chart(document.getElementById("sensorChart2"),{
+                var temperatureChart = new Chart(document.getElementById("sensorChart2"),{
                     type: "line",
                     data: {
                           "datasets": [
