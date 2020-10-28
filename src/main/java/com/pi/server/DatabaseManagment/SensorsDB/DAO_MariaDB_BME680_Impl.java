@@ -1,12 +1,9 @@
 package com.pi.server.DatabaseManagment.SensorsDB;
-
 import com.pi.server.DatabaseManagment.DAO_Basic;
-import com.pi.server.Models.OpenWeather.Weather_current_entity;
 import com.pi.server.Models.SensorModels.Sensor_BME680_entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;

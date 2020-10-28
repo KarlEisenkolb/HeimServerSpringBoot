@@ -75,5 +75,21 @@ html{
 }
 
 .table-opacity_and_color{
-    background-color: rgba(52,58,64,0);
+    background-color: rgba(0,0,0,0);
+}
+
+.opacity_warning{
+    background-color: rgba(240,173,78,0.4);
+}
+
+.opacity_alert{
+    background-color: rgba(217,83,79,0.4);
+}
+
+.opacity_ok{
+    background-color: rgba(92, 184, 92,0.2)
+}
+
+.opacity_test{
+    background-color: rgba(92, 184, 92,0.2)
 }

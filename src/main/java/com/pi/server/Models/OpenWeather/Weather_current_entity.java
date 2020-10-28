@@ -34,7 +34,10 @@ public class Weather_current_entity {
     private double pressure;
 
     @Column
-    private double humidity;
+    private double rel_hum; //rel Feuchte in %
+
+    @Column
+    private double abs_hum; //absolute Feuchte in g/m³
 
     @Column
     private double dew_point;
@@ -130,14 +133,6 @@ public class Weather_current_entity {
         this.pressure = pressure;
     }
 
-    public double getHumidity() {
-        return humidity;
-    }
-
-    public void setHumidity(double humidity) {
-        this.humidity = humidity;
-    }
-
     public double getDew_point() {
         return dew_point;
     }
@@ -216,5 +211,21 @@ public class Weather_current_entity {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public double getRel_hum() {
+        return rel_hum;
+    }
+
+    public void setRel_hum(double rel_hum) {
+        this.rel_hum = rel_hum;
+    }
+
+    public double getAbs_hum() {
+        return abs_hum;
+    }
+
+    public void setAbs_hum(double abs_hum) {
+        this.abs_hum = abs_hum;
     }
 }

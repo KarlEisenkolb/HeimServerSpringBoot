@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.exp;
+
 public class ExtractJsonData {
 
     private static final String LOG_TAG = ExtractJsonData.class.getSimpleName();
@@ -25,10 +27,17 @@ public class ExtractJsonData {
             weather_current.setTime(            current.getLong("dt"));
             weather_current.setSunrise(         current.getLong("sunrise"));
             weather_current.setSunset(          current.getLong("sunset"));
-            weather_current.setTemp(            current.getDouble("temp"));
+            double temp = current.getDouble("temp");
+            weather_current.setTemp(temp);
             weather_current.setFeels_like_temp( current.getDouble("feels_like"));
             weather_current.setPressure(        current.getDouble("pressure"));
-            weather_current.setHumidity(        current.getDouble("humidity"));
+            double relHum = current.getDouble("humidity");
+            weather_current.setRel_hum(        current.getDouble("humidity"));
+
+            double psat = 611.2*exp(17.62*temp/(243.12+temp)); //psat in Pa (Magnus-Formel Wikipedia)
+            double absHum = relHum/100*psat/(461.52*(temp+273.15))*1000; //absolute Feuchte in g/m³ aus idealem Gasgesetz
+            weather_current.setAbs_hum(absHum);
+
             weather_current.setDew_point(       current.getDouble("dew_point"));
             weather_current.setUv_index(        current.getDouble("uvi"));
             weather_current.setClouds(          current.getDouble("clouds"));
@@ -136,7 +145,7 @@ public class ExtractJsonData {
                 //weather_daily.setVisibility(      currentDay.getDouble("visibility"));
                 weather_daily.setWind_speed(      currentDay.getDouble("wind_speed"));
                 weather_daily.setWind_deg(        currentDay.getDouble("wind_deg"));
-                weather_daily.setPop(        currentDay.getDouble("pop") * 100);
+                weather_daily.setPop(Math.round(currentDay.getDouble("pop") * 100 * 100.0) / 100.0);
 
                 JSONArray weather = currentDay.getJSONArray("weather");
                 JSONObject zero = weather.getJSONObject(0);

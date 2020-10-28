@@ -68,9 +68,14 @@ public class PersistingService {
     public final static int bme680_data = 8;
 
     @Autowired
+    @Qualifier("DAO_MariaDB_BME280_Impl")
+    private DAO_Basic dao_bme280;
+    public final static int bme280_data = 9;
+
+    @Autowired
     @Qualifier("DAO_MariaDB_Particle_Impl")
     private DAO_Basic dao_particle;
-    public final static int particle_data = 9;
+    public final static int particle_data = 10;
 
     public void save (Object obj){
         if (obj instanceof Weather_current_entity)
@@ -95,6 +100,8 @@ public class PersistingService {
     public Object getLastItem(int requestedType){
         if (requestedType == CurrentWeather)
             return dao_current.getLastItem();
+        else if (requestedType == bme280_data)
+            return dao_bme280.getLastItem();
         else if (requestedType == bme680_data)
             return dao_bme680.getLastItem();
         else if (requestedType == particle_data)

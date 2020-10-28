@@ -1,0 +1,226 @@
+<div th:fragment="today_card" class="col-md-auto">
+    <h1 class="display-4 day_ueberschrift_margin_bot">Jetzt:</h1>
+    <div class="card border-secondary mb-3 card_width" id="weathercard">
+    <script th:inline="javascript">
+        var currentTime         = new Date()
+        var day                 = currentTime.getDay();
+        var element             = document.getElementById("weathercard");
+
+        if (day == 0 || day == 6){ // heute ist So oder Sa dann blauer Hintergrund
+            element.classList.add('opacity_and_color_weekend');
+        }else{
+            element.classList.add('opacity_and_color');
+        }
+    </script>
+        <div class="row align-items-center">
+            <div class="col-md-auto no_padding_left_and_right">
+                <img class="icon_height_width" th:src="@{${'/images/' + latestWeather.icon + '.svg'}}" alt="Weather Icon">
+            </div>
+            <div class="col-md-auto no_padding_left">
+                <p class="card-text" th:text="${latestWeather.description}">Wetterbeschreibung</p>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-md-auto no_padding_left_and_right">
+                <img class="icon_height_width" th:src="@{${'/images/' + hourlyweatherlist[4].icon + '.svg'}}" alt="Weather Icon">
+            </div>
+            <div class="col-md-auto no_padding_left">
+                <p class="card-text no_margin" id="weatherdescriptionin3h">Wetterbeschreibung</p>
+                <script th:inline="javascript">
+                    var weatherdescription  = /*[[${hourlyweatherlist[4].description}]]*/;
+                    var unix_timestamp      = /*[[${hourlyweatherlist[4].time}]]*/;
+                    var date                = new Date(unix_timestamp*1000);
+                    var hours               = date.getHours();
+                    var minutes             = date.getMinutes();
+                    document.getElementById("weatherdescriptionin3h").innerHTML = weatherdescription+" um " +date.getHours() +" Uhr"
+                </script>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-md-auto no_padding_left_and_right">
+                <img class="icon_height_width" src="images/thermometer.svg" alt="Weather Icon">
+            </div>
+            <div class="col-md-auto no_padding_left">
+                <p th:text="${latestWeather.temp +' °C | ' +latestWeather.feels_like_temp +' °C gefühlt'}" class="card-text no_margin">N.A. °C | N.A. °C gef.</p>
+                <p class="card-text no_margin" id="temperaturin3h">Wetterbeschreibung</p>
+                <script th:inline="javascript">
+                    var temperatur          = /*[[${hourlyweatherlist[4].temp}]]*/;
+                    var unix_timestamp      = /*[[${hourlyweatherlist[4].time}]]*/;
+                    var date                = new Date(unix_timestamp*1000);
+                    var hours               = date.getHours();
+                    var minutes             = date.getMinutes();
+                    document.getElementById("temperaturin3h").innerHTML = temperatur+" °C um " +date.getHours() +" Uhr"
+                </script>
+            </div>
+        </div>
+        <canvas id="tempChart" height="150" class="table-opacity_and_color" style="padding: 0.2vw 0.6vw 0px 0.6vw;"></canvas>
+        <script th:inline="javascript">
+            var hourlylist  = /*[[${hourlyweatherlist}]]*/;
+            var time_string = [];
+            var temp_hourly = [];
+            var pop_hourly  = [];
+
+
+            for (let i=0; i<hourlylist.length; i++) {
+                time_string[i] = hourlylist[i].time_string;
+                temp_hourly[i] = hourlylist[i].temp;
+                pop_hourly[i]  = hourlylist[i].pop;
+            }
+
+            Chart.defaults.global.defaultFontColor = 'white';
+            Chart.defaults.global.defaultFontStyle = 'normal';
+            Chart.defaults.global.defaultFontSize  = 15;
+
+            new Chart(document.getElementById("tempChart"),{
+                type: "line",
+                data: {
+                    labels: time_string,
+                    datasets: [{
+                        label: 'Temp.',
+                        backgroundColor: "rgba(2, 117, 216, 0.3)",
+                        data: temp_hourly,
+                        fill: false,
+                        borderColor: "rgb(2, 117, 216)",
+                        lineTension: 0,
+                        yAxisID: 'left-temp'
+                    },{
+                        label: 'Regen',
+                        backgroundColor: "rgba(255, 26, 0, 0.3)",
+                        data: pop_hourly,
+                        fill: false,
+                        borderColor: "rgb(255, 26, 0)",
+                        lineTension: 0,
+                        yAxisID: 'right-pop'
+                    }]
+                },
+                options: {
+                    animation: false,
+                    legend: false,
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    scales: {
+                        yAxes: [{
+                            id: 'left-temp',
+                            type: 'linear',
+                            position: 'left',
+                            ticks: {
+                                maxTicksLimit: 5,
+                                callback: function(value, index, values){
+                                    return value + '°'
+                                }
+                            },
+                            gridLines: {
+                                color: "rgb(255,255,255)",
+                                lineWidth: 0.25
+                                }
+                        }, {
+                            id: 'right-pop',
+                            type: 'linear',
+                            position: 'right',
+                            ticks: {
+                                suggestedMin: 0,
+                                suggestedMax: 100,
+                                maxTicksLimit: 5,
+                                callback: function(value, index, values){
+                                    return value + '%'
+                                }
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit: 5,
+                            },
+                            gridLines: {
+                                color: "rgb(255,255,255)",
+                                lineWidth: 0.25
+                                },
+                        }]
+                    }
+                }
+            });
+        </script>
+        <div class="card-body">
+            <table class="table table-dark table-opacity_and_color">
+                <tbody>
+                <tr>
+                    <th scope="row">Sonnenaufgang<br>Sonnenuntergang</th>
+                    <td id="suni">5:45 Uhr<br>19:45 Uhr</td>
+                    <script th:inline="javascript">
+                        var sunrise     = /*[[${latestWeather.sunrise}]]*/;
+                        var sunset      = /*[[${latestWeather.sunset}]]*/;
+
+                        var date_sunrise        = new Date(sunrise*1000);
+                        var date_sunset         = new Date(sunset*1000);
+
+                        document.getElementById("suni").innerHTML = date_sunrise.toLocaleTimeString() +" Uhr<br>" +date_sunset.toLocaleTimeString() +" Uhr";
+                    </script>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:if="${not #lists.isEmpty(currentdayterminlist.terminlist)}">
+        <div class="card border-secondary mb-3 card_width" id="termincard">
+        <script th:inline="javascript">
+            var currentTime         = new Date()
+            var day                 = currentTime.getDay();
+            var element             = document.getElementById("termincard");
+
+            if (day == 0 || day == 6){ // heute ist So oder Sa dann blauer Hintergrund
+                element.classList.add('opacity_and_color_weekend');
+            }else{
+                element.classList.add('opacity_and_color');
+            }
+        </script>
+            <div class="card-body">
+                <table class="table table-dark no_margin table-opacity_and_color">
+                    <tbody>
+                        <tr th:each="termin,terminiter:${currentdayterminlist.terminlist}">
+                            <td th:id="'termin_name' + ${terminiter.index}">N.A.</td>
+                                <script th:inline="javascript">
+                                    var name            = /*[[${termin.name}]]*/;
+                                    var type            = /*[[${termin.type}]]*/;
+                                    var erledigungszeit = /*[[${termin.erledigungszeit}]]*/;
+
+                                    var terminiter      = /*[[${terminiter.index}]]*/;
+                                    var element = document.getElementById("termin_name"+terminiter);
+
+                                    if (type == 0){ // Aufgabe
+                                        if (erledigungszeit == 0){ // nicht erledigt
+                                            element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/checkbox.svg\">" + " " + name;
+                                        }else{
+                                            element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/checkbox_checked.svg\">" + " " + name;
+                                        }
+                                    }else if (type == 2){ // Geburtstag
+                                        element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/birthday.svg\">" + " " + name;
+                                        element.classList.add('bg-dark');
+                                    }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
+                                        element.innerHTML = "<img class=\"icontermin_height_width\" src=\"/images/holiday.svg\">" + " " + name;
+                                        element.classList.add('bg-dark');
+                                    }else{
+                                        element.innerHTML = name;
+                                    }
+                                </script>
+                            <td th:text="${termin.uhrzeit}" th:id="'termin_uhrzeit' + ${terminiter.index}">N.A.</td>
+                                <script th:inline="javascript">
+                                    var type            = /*[[${termin.type}]]*/;
+
+                                    var terminiter      = /*[[${terminiter.index}]]*/;
+                                    var element = document.getElementById("termin_uhrzeit"+terminiter);
+
+                                    if (type == 2){ // Geburtstag
+                                        element.classList.add('bg-dark');
+                                    }else if (type == 3 || type == 4 || type == 5){ // Urlaub oder Schulferien oder Feiertag
+                                        element.classList.add('bg-dark');
+                                    }
+                                </script>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
