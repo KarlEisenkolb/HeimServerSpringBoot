@@ -40,29 +40,31 @@
             Http.onreadystatechange = function(){
                 if(this.readyState == 4 && this.status == 200){
                     var newPlotData = JSON.parse(Http.responseText);
-                    particleChart.data.datasets[0].data.push(newPlotData[0]);
-                    particleChart.data.datasets[1].data.push(newPlotData[1]);
-                    particleChart.data.datasets[2].data.push(newPlotData[2]);
+                    console.log(newPlotData);
+
+                    particleChart.data.datasets[0].data.push(newPlotData.latest_pm25);
+                    particleChart.data.datasets[1].data.push(newPlotData.latest_pm10);
+                    particleChart.data.datasets[2].data.push(newPlotData.latest_iaq);
                     particleChart.update();
 
-                    temperatureChart.data.datasets[0].data.push(newPlotData[3]);
-                    temperatureChart.data.datasets[1].data.push(newPlotData[4]);
-                    temperatureChart.data.datasets[2].data.push(newPlotData[5]);
+                    temperatureChart.data.datasets[0].data.push(newPlotData.latest_680temp);
+                    temperatureChart.data.datasets[1].data.push(newPlotData.latest_680relhum);
+                    temperatureChart.data.datasets[2].data.push(newPlotData.latest_aussentemp);
                     temperatureChart.update();
 
-                    document.getElementById('diele_pm25').innerHTML     = Math.round(newPlotData[0].y*100)/100+'&mu;g/m&sup3;';
-                    document.getElementById('diele_pm10').innerHTML     = Math.round(newPlotData[1].y*100)/100+'&mu;g/m&sup3;';
-                    document.getElementById('diele_iaq').innerHTML      = Math.round(newPlotData[2].y*100)/100;
-                    document.getElementById('diele_temp').innerHTML     = Math.round(newPlotData[3].y*100)/100+'°C';
-                    document.getElementById('diele_relhum').innerHTML   = Math.round(newPlotData[4].y*100)/100+'%';
-                    document.getElementById('diele_abshum').innerHTML   = Math.round(newPlotData[6].y*100)/100+'g/m&sup3;';
+                    document.getElementById('diele_pm25').innerHTML     = Math.round(newPlotData.latest_pm25.y*100)/100+'&mu;g/m&sup3;';
+                    document.getElementById('diele_pm10').innerHTML     = Math.round(newPlotData.latest_pm10.y*100)/100+'&mu;g/m&sup3;';
+                    document.getElementById('diele_iaq').innerHTML      = Math.round(newPlotData.latest_iaq.y*100)/100;
+                    document.getElementById('diele_temp').innerHTML     = Math.round(newPlotData.latest_680temp.y*100)/100+'°C';
+                    document.getElementById('diele_relhum').innerHTML   = Math.round(newPlotData.latest_680relhum.y*100)/100+'%';
+                    document.getElementById('diele_abshum').innerHTML   = Math.round(newPlotData.latest_680abshum.y*100)/100+'g/m&sup3;';
 
                     document.getElementById('bad_pm25').innerHTML     = "-";
                     document.getElementById('bad_pm10').innerHTML     = "-";
                     document.getElementById('bad_iaq').innerHTML      = "-";
-                    document.getElementById('bad_temp').innerHTML     = Math.round(newPlotData[7].y*100)/100+'°C';
-                    document.getElementById('bad_relhum').innerHTML   = Math.round(newPlotData[8].y*100)/100+'%';
-                    document.getElementById('bad_abshum').innerHTML   = Math.round(newPlotData[9].y*100)/100+'g/m&sup3;';
+                    document.getElementById('bad_temp').innerHTML     = Math.round(newPlotData.latest_280temp.y*100)/100+'°C';
+                    document.getElementById('bad_relhum').innerHTML   = Math.round(newPlotData.latest_280relhum.y*100)/100+'%';
+                    document.getElementById('bad_abshum').innerHTML   = Math.round(newPlotData.latest_280abshum.y*100)/100+'g/m&sup3;';
 
                     var tempaussen      = /*[[${latestWeather.temp}]]*/;
                     var rel_hum_aussen  = /*[[${latestWeather.rel_hum}]]*/;
@@ -77,7 +79,6 @@
                 }
             }
         }
-
         setInterval(updateChartData, 3000);
     </script>
 

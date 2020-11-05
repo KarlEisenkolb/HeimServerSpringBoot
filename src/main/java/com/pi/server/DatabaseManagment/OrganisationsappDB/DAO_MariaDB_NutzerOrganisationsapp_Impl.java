@@ -1,6 +1,5 @@
 package com.pi.server.DatabaseManagment.OrganisationsappDB;
 
-import com.pi.server.DatabaseManagment.DAO_Basic;
 import com.pi.server.Models.Organisationsapp.OrganisationsApp_Nutzer_entity;
 import com.pi.server.Models.Organisationsapp.Token_FirebaseMessagingOrganisationsApp_entity;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<OrganisationsApp_Nutzer_entity>, DAO_Organisationsapp<OrganisationsApp_Nutzer_entity>{
+public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Organisationsapp<OrganisationsApp_Nutzer_entity>{
 
     private final Logger log = LoggerFactory.getLogger(DAO_MariaDB_NutzerOrganisationsapp_Impl.class);
 
@@ -23,23 +22,7 @@ public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<Organi
 
     @Override
     public OrganisationsApp_Nutzer_entity get(String id) {
-        /*TypedQuery<Nutzer_entity> q1 = entityManager.createQuery("SELECT a FROM " + Nutzer_entity.TableName + " a WHERE a.firebaseID = :itemId", Nutzer_entity.class);
-        q1.setParameter("itemId", id);
-        Nutzer_entity nutzer_entity = q1.getSingleResult();
-
-        List<String> tokenStringList = new ArrayList<>();
-        TypedQuery<Token_FirebaseMessagingOrganisationsApp_entity> q2 = entityManager.createQuery("SELECT b FROM " + Token_FirebaseMessagingOrganisationsApp_entity.TableName + " b WHERE b.nutzer_entity.firebaseID = :itemId", Token_FirebaseMessagingOrganisationsApp_entity.class);
-        q2.setParameter("itemId", id);
-        List<Token_FirebaseMessagingOrganisationsApp_entity> tokenEntityList = q2.getResultList();
-        for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : tokenEntityList)
-            tokenStringList.add(tokenEntity.getToken());
-        nutzer_entity.setTokenStringlist(tokenStringList);*/
         return entityManager.find(OrganisationsApp_Nutzer_entity.class, id);
-    }
-
-    @Override
-    public OrganisationsApp_Nutzer_entity getLastItem() {
-        return null;
     }
 
     @Override
@@ -50,21 +33,16 @@ public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<Organi
     }
 
     @Override
-    public List<OrganisationsApp_Nutzer_entity> getAll_withStartAndEndTime(long startTime, long endTime) {
-        return null;
-    }
-
-    @Override
-    public OrganisationsApp_Nutzer_entity get(long id) {
-        return null;
-    }
-
-    @Override
     public List<OrganisationsApp_Nutzer_entity> getAll() {
         String queryString = "SELECT a FROM " + OrganisationsApp_Nutzer_entity.TableName + " a";
         TypedQuery<OrganisationsApp_Nutzer_entity> query = entityManager.createQuery(queryString, OrganisationsApp_Nutzer_entity.class);
         log.info("Nutzer aus Datenbank: {}", queryString);
         return query.getResultList();
+    }
+
+    @Override
+    public List<OrganisationsApp_Nutzer_entity> getAll_withStartAndEndTime(long startTime, long endTime) {
+        return null;
     }
 
     @Transactional
@@ -73,9 +51,8 @@ public class DAO_MariaDB_NutzerOrganisationsapp_Impl implements DAO_Basic<Organi
         entityManager.persist(t_save);
     }
 
-    @Transactional
     @Override
-    public void update(OrganisationsApp_Nutzer_entity t_alt, OrganisationsApp_Nutzer_entity t_neu) {
+    public void update(OrganisationsApp_Nutzer_entity t_old, OrganisationsApp_Nutzer_entity t_new) {
 
     }
 

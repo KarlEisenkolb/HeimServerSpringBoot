@@ -1,12 +1,13 @@
 package com.pi.server.GuiController_out;
 
+import com.pi.server.DatabaseManagment.PersistingService_Sensors;
 import com.pi.server.GuiServices_out.MainService;
 import com.pi.server.GuiServices_out.SensorService;
 import com.pi.server.GuiServices_out.ServerDataStatusService;
 import com.pi.server.Models.OpenWeather.Weather_current_entity;
 import com.pi.server.Models.SensorModels.Mav_XYPlotData;
-import com.pi.server.Models.SensorModels.Sensor_BME680_entity;
-import com.pi.server.Models.SensorModels.Sensor_Particle_entity;
+import com.pi.server.Models.SensorModels.BME680.Sensor_BME680_entity;
+import com.pi.server.Models.SensorModels.Particle.Sensor_Particle_entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,6 @@ public class MainController {
     private MainService mainService;
     @Autowired
     private SensorService sensorService;
-
     @Autowired
     private ServerDataStatusService serverDataStatusService;
 
@@ -45,19 +45,20 @@ public class MainController {
     @EventListener(ApplicationReadyEvent.class)
     public void getServerDataUrlAfterServerStart(){
         WEBSITE_GET_DATA_STATUS_URL = "http://" + serverIp + ":" + serverPort + "/data_status";
-        WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
-        //WEBSITE_UPDATE_PLOT_DATA_URL = "http://localhost:1990/update_plot_data";
+        //WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
+        WEBSITE_UPDATE_PLOT_DATA_URL = "http://localhost:1990/update_plot_data";
         System.out.println(WEBSITE_GET_DATA_STATUS_URL);
     }
 
     @RequestMapping("/")
-    public ModelAndView mainTemplate(){
+    public ModelAndView mainTemplate(@RequestParam String location){
         ModelAndView mav = new ModelAndView(TEMPLATE_MAIN);
 
-        basicData(mav);
+        basicData(mav, location);
+        sensorData(mav, location);
         weatherData(mav);
         organisationsappData(mav);
-        sensorData(mav);
+
         return mav;
     }
 
@@ -67,11 +68,12 @@ public class MainController {
     }
 
     @RequestMapping("/update_plot_data")
-    public Object updatePlotData(){
-        return sensorService.getLatestSensorDataForGuiUpdate();
+    public Object updatePlotData(@RequestParam String location){
+        return sensorService.getLatestSensorDataForGuiUpdate(location);
     }
 
-    private void basicData(ModelAndView mav) {
+    private void basicData(ModelAndView mav, String location) {
+        WEBSITE_UPDATE_PLOT_DATA_URL += "/?location=" + location;
         mav.addObject("website_get_data_status_url", WEBSITE_GET_DATA_STATUS_URL);
         mav.addObject("website_update_plot_data_url", WEBSITE_UPDATE_PLOT_DATA_URL);
         mav.addObject("time_and_date_string_long", mainService.getTimeAndDateString(mainService.DATE_LONG));
@@ -97,9 +99,9 @@ public class MainController {
         mav.addObject("headingsdates", mainService.getDateHeadingStrings(anzahl_Tageskacheln));
     }
 
-    private void sensorData(ModelAndView mav){
+    private void sensorData(ModelAndView mav, String location){
 
-        List bme680List = sensorService.getBme680Content();
+        List bme680List = sensorService.getBme680Content(location);
         List<Mav_XYPlotData> iaq        = new ArrayList<>();
         List<Mav_XYPlotData> temp_in    = new ArrayList<>();
         List<Mav_XYPlotData> rel_hum    = new ArrayList<>();
@@ -114,7 +116,7 @@ public class MainController {
         mav.addObject("rel_hum", rel_hum);
 
 
-        List particleList = sensorService.getParticleContent();
+        List particleList = sensorService.getParticleContent(location);
         List<Mav_XYPlotData> pm25   = new ArrayList<>();
         List<Mav_XYPlotData> pm10   = new ArrayList<>();
 

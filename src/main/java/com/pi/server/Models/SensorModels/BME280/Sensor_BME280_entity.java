@@ -1,11 +1,11 @@
-package com.pi.server.Models.SensorModels;
+package com.pi.server.Models.SensorModels.BME280;
+
 import javax.persistence.*;
 
-@Entity(name = Sensor_BME280_entity.TableName)
-@Table(name = Sensor_BME280_entity.TableName)
+@MappedSuperclass
 public class Sensor_BME280_entity {
 
-    public final static String TableName = "sensor_bme280";
+    final public static String SENSOR_BME280  = "sensor_bme280_";
 
     @Id
     @Column

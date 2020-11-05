@@ -5,7 +5,7 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.messaging.*;
-import com.pi.server.DatabaseManagment.PersistingService;
+import com.pi.server.DatabaseManagment.PersistingService_Organisationsapp;
 import com.pi.server.Firebase.FirebaseInitialization;
 import com.pi.server.GuiServices_out.ServerDataStatusService;
 import com.pi.server.Models.Organisationsapp.FirebaseCrypt_Nutzer;
@@ -23,8 +23,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.ExecutionException;
 
-import static com.pi.server.DatabaseManagment.PersistingService.NutzerOrganisationsapp;
-import static com.pi.server.DatabaseManagment.PersistingService.NutzerOrganisationsapp_withNutzerName;
+import static com.pi.server.DatabaseManagment.PersistingService_Organisationsapp.NutzerOrganisationsapp;
+import static com.pi.server.DatabaseManagment.PersistingService_Organisationsapp.NutzerOrganisationsapp_withNutzerNameAsId;
 import static com.pi.server.Models.Organisationsapp.FirebaseCrypt_Termin_entity.*;
 import static com.pi.server.SecurityHandling.Crypt.CRYPT_USE_DEFAULT_KEY;
 
@@ -38,7 +38,7 @@ public class FirebaseMessagingServiceOrganisationsapp {
     private int numberOfTerminListener;
 
     @Autowired
-    PersistingService persistingService;
+    PersistingService_Organisationsapp persistingService;
 
     @Autowired
     ServerDataStatusService serverDataStatusService;
@@ -158,12 +158,12 @@ public class FirebaseMessagingServiceOrganisationsapp {
         if (serverBootSituation)
             return;
         else{
-            OrganisationsApp_Nutzer_entity terminBesitzer_entityToContact = (OrganisationsApp_Nutzer_entity) persistingService.get(currentTermin.gibBesitzer(), NutzerOrganisationsapp_withNutzerName);
+            OrganisationsApp_Nutzer_entity terminBesitzer_entityToContact = (OrganisationsApp_Nutzer_entity) persistingService.get(currentTermin.gibBesitzer(), NutzerOrganisationsapp_withNutzerNameAsId);
             for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : terminBesitzer_entityToContact.getTokens())
                 buildNotificationAndSend(currentTermin, tokenEntity, type);
 
             for (String nutzerToContact : currentTermin.gibSharedTerminNutzerList()) {
-                OrganisationsApp_Nutzer_entity nutzer_entityToContact = (OrganisationsApp_Nutzer_entity) persistingService.get(nutzerToContact, NutzerOrganisationsapp_withNutzerName);
+                OrganisationsApp_Nutzer_entity nutzer_entityToContact = (OrganisationsApp_Nutzer_entity) persistingService.get(nutzerToContact, NutzerOrganisationsapp_withNutzerNameAsId);
                 for (Token_FirebaseMessagingOrganisationsApp_entity tokenEntity : nutzer_entityToContact.getTokens())
                     buildNotificationAndSend(currentTermin, tokenEntity, type);
             }

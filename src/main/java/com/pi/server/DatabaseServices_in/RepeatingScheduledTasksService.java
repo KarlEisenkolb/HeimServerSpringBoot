@@ -1,6 +1,6 @@
 package com.pi.server.DatabaseServices_in;
 
-import com.pi.server.DatabaseManagment.PersistingService;
+import com.pi.server.DatabaseManagment.PersistingService_Weather;
 import com.pi.server.GuiServices_out.ServerDataStatusService;
 import com.pi.server.HttpRequests.CustomHttpRequest;
 import com.pi.server.HttpRequests.ExtractJsonData;
@@ -30,7 +30,7 @@ public class RepeatingScheduledTasksService {
     private final String stringUrl = OpenWeatherAPI_BASE_REQUEST_FORECAST + OpenWeatherAPI_COORDINATES_lat_lon + SPRACHE_DEUTSCH + UNITS_METRIC + OpenWeatherAPI_KEY;
 
     @Autowired
-    PersistingService persistingService;
+    PersistingService_Weather persistingService_weather;
 
     @Autowired
     ServerDataStatusService serverDataStatusService;
@@ -42,13 +42,13 @@ public class RepeatingScheduledTasksService {
         String jsonResponse = CustomHttpRequest.startRequestInstance(stringUrl);
 
         Weather_current_entity weather_current = ExtractJsonData.extractData_current(jsonResponse);
-        persistingService.save(weather_current);
+        persistingService_weather.save(weather_current);
 
         List<WeatherForecast_hourly_entity> weatherListHourly = ExtractJsonData.extractAllData_hourly(jsonResponse);
-        persistingService.saveListOfDataAndDeleteFormerData(weatherListHourly);
+        persistingService_weather.saveListOfDataAndDeleteFormerData(weatherListHourly);
 
         List<WeatherForecast_daily_entity> weatherListDaily = ExtractJsonData.extractAllData_daily(jsonResponse);
-        persistingService.saveListOfDataAndDeleteFormerData(weatherListDaily);
+        persistingService_weather.saveListOfDataAndDeleteFormerData(weatherListDaily);
 
         serverDataStatusService.setNewServerStatusAfterDataChange();
     }

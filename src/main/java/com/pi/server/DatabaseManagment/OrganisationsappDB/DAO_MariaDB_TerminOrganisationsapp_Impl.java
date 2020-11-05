@@ -1,11 +1,9 @@
 package com.pi.server.DatabaseManagment.OrganisationsappDB;
 
-import com.pi.server.DatabaseManagment.DAO_Basic;
 import com.pi.server.Models.Organisationsapp.FirebaseCrypt_Termin_entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -13,7 +11,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public class DAO_MariaDB_TerminOrganisationsapp_Impl implements DAO_Basic<FirebaseCrypt_Termin_entity>, DAO_Organisationsapp<FirebaseCrypt_Termin_entity> {
+public class DAO_MariaDB_TerminOrganisationsapp_Impl implements DAO_Organisationsapp<FirebaseCrypt_Termin_entity>{
 
     private final Logger log = LoggerFactory.getLogger(DAO_MariaDB_TerminOrganisationsapp_Impl.class);
 
@@ -21,22 +19,18 @@ public class DAO_MariaDB_TerminOrganisationsapp_Impl implements DAO_Basic<Fireba
     EntityManager entityManager;
 
     @Override
-    public FirebaseCrypt_Termin_entity get(long id) {
-        return null;
-    }
-
-    @Override
     public FirebaseCrypt_Termin_entity get(String id) {
         return entityManager.find(FirebaseCrypt_Termin_entity.class, id);
     }
 
     @Override
-    public FirebaseCrypt_Termin_entity getLastItem() {
+    public FirebaseCrypt_Termin_entity get_withNutzerName(String name) {
         return null;
     }
 
+
     @Override
-    public FirebaseCrypt_Termin_entity get_withNutzerName(String name) {
+    public List<FirebaseCrypt_Termin_entity> getAll() {
         return null;
     }
 
@@ -55,11 +49,6 @@ public class DAO_MariaDB_TerminOrganisationsapp_Impl implements DAO_Basic<Fireba
 
         TypedQuery<FirebaseCrypt_Termin_entity> query = entityManager.createQuery(queryString, FirebaseCrypt_Termin_entity.class);
         return query.getResultList();
-    }
-
-    @Override
-    public List<FirebaseCrypt_Termin_entity> getAll() {
-        return null;
     }
 
     @Transactional

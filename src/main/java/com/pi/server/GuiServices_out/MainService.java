@@ -1,6 +1,7 @@
 package com.pi.server.GuiServices_out;
 
-import com.pi.server.DatabaseManagment.PersistingService;
+import com.pi.server.DatabaseManagment.PersistingService_Organisationsapp;
+import com.pi.server.DatabaseManagment.PersistingService_Weather;
 import com.pi.server.Models.Organisationsapp.Mav_DayMitTerminen;
 import com.pi.server.Models.Organisationsapp.Mav_TerminDecrypted;
 import com.pi.server.Models.Organisationsapp.FirebaseCrypt_Termin_entity;
@@ -12,11 +13,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.pi.server.DatabaseManagment.PersistingService_Organisationsapp.NutzerOrganisationsapp_Termin;
+import static com.pi.server.DatabaseManagment.PersistingService_Weather.*;
+
 @Service
 public class MainService {
 
     @Autowired
-    private PersistingService persistingService;
+    private PersistingService_Weather persistingService_weather;
+    @Autowired
+    private PersistingService_Organisationsapp persistingService_orgaApp;
 
     public final int DATE_SHORT = 0;
     public final int DATE_LONG = 1;
@@ -45,15 +51,15 @@ public class MainService {
     }
 
     public Object getLatestCurrentWeather() {
-        return persistingService.getLastItem(PersistingService.CurrentWeather);
+        return persistingService_weather.getLastItem(CurrentWeather);
     }
 
     public List getWeatherHourlyForecastContent(){
-        return persistingService.getAll(PersistingService.HourlyWeather);
+        return persistingService_weather.getAll(HourlyWeather);
     }
 
     public List getWeatherDailyForecastContent(){
-        return persistingService.getAll(PersistingService.DailyWeather);
+        return persistingService_weather.getAll(DailyWeather);
     }
 
     public List getTermineForDaysToDisplay(int anzahl_Tageskacheln){
@@ -69,7 +75,7 @@ public class MainService {
 
     private void setTermineInDayList(List<Mav_DayMitTerminen> daylist){
         long lastDayInDayListPlusOneDayInMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(daylist.get(daylist.size()-1).getTime_utc()), ZoneId.systemDefault()).plus(1, ChronoUnit.DAYS).toInstant().toEpochMilli(); // der Endzeitpunkt soll auch Termin beeinhalten die nach 0:00 des Endtages starten
-        List<FirebaseCrypt_Termin_entity> completeTerminList = (List<FirebaseCrypt_Termin_entity>)(Object) persistingService.getAllInTimeframe(PersistingService.NutzerOrganisationsapp_Termin, daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
+        List<FirebaseCrypt_Termin_entity> completeTerminList = (List<FirebaseCrypt_Termin_entity>)(Object) persistingService_orgaApp.getAll_withStartAndEndTime(NutzerOrganisationsapp_Termin, daylist.get(0).getTime_utc(), lastDayInDayListPlusOneDayInMillis);
 
         //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'Uhr |' EEE d MMM ");
         //for(Termin_FirebaseCrypt termin : completeTerminList) //debugging listoutput

@@ -1,7 +1,7 @@
 package com.pi.server.GuiServices_out;
 
-import com.pi.server.SecurityHandling.Crypt;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 @Service
 public class ServerDataStatusService {
@@ -13,10 +13,8 @@ public class ServerDataStatusService {
     }
 
     public void setNewServerStatusAfterDataChange(){
-        Crypt crypt = new Crypt(Crypt.CRYPT_USE_DEFAULT_KEY);
-        String s = crypt.encryptLong(System.currentTimeMillis());
-        serverStatus = s.substring(0, Math.min(s.length(), 6));;
-        System.out.println(serverStatus);
+        serverStatus = UUID.randomUUID().toString();
+        //System.out.println(serverStatus);
     }
 
     public String getServerStatus(){
