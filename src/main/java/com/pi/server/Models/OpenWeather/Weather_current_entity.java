@@ -77,11 +77,11 @@ public class Weather_current_entity {
         this.id = id;
     }
 
-    public long getRequestTimestamp() {
+    public long getRequest_timestamp() {
         return request_timestamp;
     }
 
-    public void setRequestTimestamp(long request_timestamp) {
+    public void setRequest_timestamp(long request_timestamp) {
         this.request_timestamp = request_timestamp;
     }
 

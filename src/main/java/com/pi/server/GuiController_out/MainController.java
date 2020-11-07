@@ -44,8 +44,8 @@ public class MainController {
     @EventListener(ApplicationReadyEvent.class)
     public void getServerDataUrlAfterServerStart(){
         WEBSITE_GET_DATA_STATUS_URL = "http://" + serverIp + ":" + serverPort + "/data_status";
-        WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
-        //WEBSITE_UPDATE_PLOT_DATA_URL = "http://localhost:1990/update_plot_data";
+        //WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
+        WEBSITE_UPDATE_PLOT_DATA_URL = "http://localhost:1990/update_plot_data";
         System.out.println(WEBSITE_GET_DATA_STATUS_URL);
     }
 
@@ -130,7 +130,7 @@ public class MainController {
         List<Mav_XYPlotData> currentweather_templist   = new ArrayList<>();
 
         for(Weather_current_entity currentWeather : (List<Weather_current_entity>)(List<?>) currentWeatherDataList){
-            currentweather_templist.add(new Mav_XYPlotData(currentWeather.getRequestTimestamp(), currentWeather.getTemp()));
+            currentweather_templist.add(new Mav_XYPlotData(currentWeather.getRequest_timestamp(), currentWeather.getTemp()));
         }
         mav.addObject("currentweather_templist", currentweather_templist);
     }

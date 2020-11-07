@@ -42,36 +42,36 @@
                     var newPlotData = JSON.parse(Http.responseText);
                     console.log(newPlotData);
 
-                    particleChart.data.datasets[0].data.push(newPlotData.latest_pm25);
-                    particleChart.data.datasets[1].data.push(newPlotData.latest_pm10);
-                    particleChart.data.datasets[2].data.push(newPlotData.latest_iaq);
+                    particleChart.data.datasets[0].data.push(newPlotData.latest_plot_pm25);
+                    particleChart.data.datasets[1].data.push(newPlotData.latest_plot_pm10);
+                    particleChart.data.datasets[2].data.push(newPlotData.latest_plot_iaq);
                     particleChart.update();
 
-                    temperatureChart.data.datasets[0].data.push(newPlotData.latest_680temp);
-                    temperatureChart.data.datasets[1].data.push(newPlotData.latest_680relhum);
-                    temperatureChart.data.datasets[2].data.push(newPlotData.latest_aussentemp);
+                    temperatureChart.data.datasets[0].data.push(newPlotData.latest_plot_temp);
+                    temperatureChart.data.datasets[1].data.push(newPlotData.latest_plot_relhum);
+                    temperatureChart.data.datasets[2].data.push(newPlotData.latest_plot_aussentemp);
                     temperatureChart.update();
 
-                    document.getElementById('diele_pm25').innerHTML     = Math.round(newPlotData.latest_pm25.y*100)/100+'&mu;g/m&sup3;';
-                    document.getElementById('diele_pm10').innerHTML     = Math.round(newPlotData.latest_pm10.y*100)/100+'&mu;g/m&sup3;';
-                    document.getElementById('diele_iaq').innerHTML      = Math.round(newPlotData.latest_iaq.y*100)/100;
-                    document.getElementById('diele_temp').innerHTML     = Math.round(newPlotData.latest_680temp.y*100)/100+'°C';
-                    document.getElementById('diele_relhum').innerHTML   = Math.round(newPlotData.latest_680relhum.y*100)/100+'%';
-                    document.getElementById('diele_abshum').innerHTML   = Math.round(newPlotData.latest_680abshum.y*100)/100+'g/m&sup3;';
+                    document.getElementById('diele_pm25').innerHTML     = Math.round(newPlotData.latest_pm25_bibliothek.y*100)/100+'&mu;g/m&sup3;';
+                    document.getElementById('diele_pm10').innerHTML     = Math.round(newPlotData.latest_pm10_bibliothek.y*100)/100+'&mu;g/m&sup3;';
+                    document.getElementById('diele_iaq').innerHTML      = Math.round(newPlotData.latest_iaq_bibliothek.y*100)/100;
+                    document.getElementById('diele_temp').innerHTML     = Math.round(newPlotData.latest_temp_bibliothek.y*100)/100+'°C';
+                    document.getElementById('diele_relhum').innerHTML   = Math.round(newPlotData.latest_relhum_bibliothek.y*100)/100+'%';
+                    document.getElementById('diele_abshum').innerHTML   = Math.round(newPlotData.latest_abshum_bibliothek.y*100)/100+'g/m&sup3;';
 
                     document.getElementById('bad_pm25').innerHTML     = "-";
                     document.getElementById('bad_pm10').innerHTML     = "-";
                     document.getElementById('bad_iaq').innerHTML      = "-";
-                    document.getElementById('bad_temp').innerHTML     = Math.round(newPlotData.latest_280temp.y*100)/100+'°C';
-                    document.getElementById('bad_relhum').innerHTML   = Math.round(newPlotData.latest_280relhum.y*100)/100+'%';
-                    document.getElementById('bad_abshum').innerHTML   = Math.round(newPlotData.latest_280abshum.y*100)/100+'g/m&sup3;';
+                    document.getElementById('bad_temp').innerHTML     = Math.round(newPlotData.latest_temp_bad.y*100)/100+'°C';
+                    document.getElementById('bad_relhum').innerHTML   = Math.round(newPlotData.latest_relhum_bad.y*100)/100+'%';
+                    document.getElementById('bad_abshum').innerHTML   = Math.round(newPlotData.latest_abshum_bad.y*100)/100+'g/m&sup3;';
 
                     document.getElementById('schlafzimmer_pm25').innerHTML     = "-";
                     document.getElementById('schlafzimmer_pm10').innerHTML     = "-";
-                    document.getElementById('schlafzimmer_iaq').innerHTML      = Math.round(newPlotData.latest_iaq_schl.y*100)/100;
-                    document.getElementById('schlafzimmer_temp').innerHTML     = Math.round(newPlotData.latest_680temp_schl.y*100)/100+'°C';
-                    document.getElementById('schlafzimmer_relhum').innerHTML   = Math.round(newPlotData.latest_680relhum_schl.y*100)/100+'%';
-                    document.getElementById('schlafzimmer_abshum').innerHTML   = Math.round(newPlotData.latest_680abshum_schl.y*100)/100+'g/m&sup3;';
+                    document.getElementById('schlafzimmer_iaq').innerHTML      = Math.round(newPlotData.latest_iaq_schlafzimmer.y*100)/100;
+                    document.getElementById('schlafzimmer_temp').innerHTML     = Math.round(newPlotData.latest_temp_schlafzimmer.y*100)/100+'°C';
+                    document.getElementById('schlafzimmer_relhum').innerHTML   = Math.round(newPlotData.latest_relhum_schlafzimmer.y*100)/100+'%';
+                    document.getElementById('schlafzimmer_abshum').innerHTML   = Math.round(newPlotData.latest_abshum_schlafzimmer.y*100)/100+'g/m&sup3;';
 
                     var tempaussen      = /*[[${latestWeather.temp}]]*/;
                     var rel_hum_aussen  = /*[[${latestWeather.rel_hum}]]*/;

@@ -23,7 +23,7 @@ public class ExtractJsonData {
             JSONObject jsonObj = new JSONObject(jsonResponse);
             JSONObject current = jsonObj.getJSONObject("current");
 
-            weather_current.setRequestTimestamp(System.currentTimeMillis());
+            weather_current.setRequest_timestamp(System.currentTimeMillis());
             weather_current.setTime(            current.getLong("dt"));
             weather_current.setSunrise(         current.getLong("sunrise"));
             weather_current.setSunset(          current.getLong("sunset"));

@@ -7,16 +7,13 @@ import com.pi.server.Models.SensorModels.Mav_XYPlotData;
 import com.pi.server.Models.SensorModels.BME280.Sensor_BME280_entity;
 import com.pi.server.Models.SensorModels.BME680.Sensor_BME680_entity;
 import com.pi.server.Models.SensorModels.Particle.Sensor_Particle_entity;
-import org.mariadb.jdbc.internal.com.read.resultset.SelectResultSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.pi.server.DatabaseManagment.PersistingService_Sensors.*;
 import static com.pi.server.DatabaseManagment.PersistingService_Weather.CurrentWeather;
 import static com.pi.server.Models.SensorModels.BME280.Sensor_BME280_entity.SENSOR_BME280;
 import static com.pi.server.Models.SensorModels.BME680.Sensor_BME680_entity.SENSOR_BME680;
@@ -57,36 +54,11 @@ public class SensorService {
         return persistingService_weather.getAll_withStartAndEndTime(currentTimeInMillis-timeIntervall, currentTimeInMillis, CurrentWeather);
     }
 
-    public Object getLatestSensorDataForGuiUpdate(String locationsdsdf) {
+    public Object getLatestSensorDataForGuiUpdate(String currReqLocation) {
         long currentTimeInMillis = System.currentTimeMillis();
-
-        Sensor_BME280_entity bme280Data             = (Sensor_BME280_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME280, LOCATION_BAD);
-        Sensor_BME680_entity bme680Data_bib         = (Sensor_BME680_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME680, LOCATION_BIBLIOTHEK);
-        Sensor_BME680_entity bme680Data_schlaf      = (Sensor_BME680_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME680, LOCATION_SCHLAFZIMMER);
-        Sensor_Particle_entity particleData         = (Sensor_Particle_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_PARTICLE, LOCATION_BIBLIOTHEK);
         Weather_current_entity currentWeatherData   = (Weather_current_entity) persistingService_weather.getLastItem(CurrentWeather);
-
         HashMap<String, Object> map = new HashMap<>();
-
-        // Daten zum aktualiseren der Plots
-        map.put("latest_pm25", new Mav_XYPlotData(particleData.getId(), particleData.getPm25()));
-        map.put("latest_pm10", new Mav_XYPlotData(particleData.getId(), particleData.getPm10()));
-        map.put("latest_iaq", new Mav_XYPlotData(bme680Data_bib.getId(), bme680Data_bib.getIaq()));
-
-        map.put("latest_680temp", new Mav_XYPlotData(bme680Data_bib.getId(), bme680Data_bib.getTemp()));
-        map.put("latest_680relhum", new Mav_XYPlotData(bme680Data_bib.getId(), bme680Data_bib.getRel_hum()));
-        map.put("latest_aussentemp", new Mav_XYPlotData(currentWeatherData.getRequestTimestamp(), currentWeatherData.getTemp()));
-
-        // zusätzliche Daten für die Tabelle
-        map.put("latest_680abshum", new Mav_XYPlotData(bme680Data_bib.getId(), bme680Data_bib.getAbs_hum()));
-        map.put("latest_280temp", new Mav_XYPlotData(bme280Data.getId(), bme280Data.getTemp()));
-        map.put("latest_280relhum", new Mav_XYPlotData(bme280Data.getId(), bme280Data.getRel_hum()));
-        map.put("latest_280abshum", new Mav_XYPlotData(bme280Data.getId(), bme280Data.getAbs_hum()));
-
-        map.put("latest_iaq_schl", new Mav_XYPlotData(bme680Data_schlaf.getId(), bme680Data_schlaf.getIaq()));
-        map.put("latest_680temp_schl", new Mav_XYPlotData(bme680Data_schlaf.getId(), bme680Data_schlaf.getTemp()));
-        map.put("latest_680relhum_schl", new Mav_XYPlotData(bme680Data_schlaf.getId(), bme680Data_schlaf.getRel_hum()));
-        map.put("latest_680abshum_schl", new Mav_XYPlotData(bme680Data_schlaf.getId(), bme680Data_schlaf.getAbs_hum()));
+        map.put("latest_plot_aussentemp", new Mav_XYPlotData(currentWeatherData.getRequest_timestamp(), currentWeatherData.getTemp()));
 
         String sensor_report = "Alle Sensoren verbunden. Daten sind aktuell";
         List<String> sensorNoContactYellowList = new ArrayList<>();
@@ -115,6 +87,16 @@ public class SensorService {
             for (String sensor : sensorslist) {
                 if (sensor.contains(SENSOR_BME680)) {
                     Sensor_BME680_entity bme680 = (Sensor_BME680_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME680, location);
+                    map.put("latest_iaq_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
+                    map.put("latest_temp_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
+                    map.put("latest_relhum_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
+                    map.put("latest_abshum_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getAbs_hum()));
+
+                    if (location.equals(currReqLocation)){
+                        map.put("latest_plot_iaq", new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
+                        map.put("latest_plot_temp", new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
+                        map.put("latest_plot_relhum", new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
+                    }
 
                     if(bme680.getId() < currentTimeInMillis-1000*60*20) //Daten älter als 20 min
                         sensorNoContactRedList.add("BME680 (" + location + ") ");
@@ -140,6 +122,15 @@ public class SensorService {
 
                 }else if (sensor.contains(SENSOR_BME280)) {
                     Sensor_BME280_entity bme280 = (Sensor_BME280_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME280, location);
+                    map.put("latest_temp_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
+                    map.put("latest_relhum_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
+                    map.put("latest_abshum_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getAbs_hum()));
+
+                    if (location.equals(currReqLocation)){
+                        map.put("latest_plot_iaq", new Mav_XYPlotData(bme280.getId(), 0));
+                        map.put("latest_plot_temp", new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
+                        map.put("latest_plot_relhum", new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
+                    }
 
                     if(bme280.getId() < currentTimeInMillis-1000*60*20) //Daten älter als 20 min
                         sensorNoContactRedList.add("BME280 (" + location + ") ");
@@ -159,6 +150,13 @@ public class SensorService {
 
                 }else if (sensor.contains(SENSOR_PARTICLE)) {
                     Sensor_Particle_entity particle = (Sensor_Particle_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_PARTICLE, location);
+                    map.put("latest_pm25_" + location, new Mav_XYPlotData(particle.getId(), particle.getPm25()));
+                    map.put("latest_pm10_" + location, new Mav_XYPlotData(particle.getId(), particle.getPm10()));
+
+                    if (location.equals(currReqLocation)){
+                        map.put("latest_plot_pm25", new Mav_XYPlotData(particle.getId(), particle.getPm25()));
+                        map.put("latest_plot_pm10", new Mav_XYPlotData(particle.getId(), particle.getPm10()));
+                    }
 
                     if(particle.getId() < currentTimeInMillis-1000*60*20) //Daten älter als 20 min
                         sensorNoContactRedList.add("Partikelsensor (" + location + ") ");
