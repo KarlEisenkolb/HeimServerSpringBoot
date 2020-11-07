@@ -44,8 +44,8 @@ public class MainController {
     @EventListener(ApplicationReadyEvent.class)
     public void getServerDataUrlAfterServerStart(){
         WEBSITE_GET_DATA_STATUS_URL = "http://" + serverIp + ":" + serverPort + "/data_status";
-        //WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
-        WEBSITE_UPDATE_PLOT_DATA_URL = "http://localhost:1990/update_plot_data";
+        WEBSITE_UPDATE_PLOT_DATA_URL = "http://" + serverIp + ":" + serverPort + "/update_plot_data";
+        //WEBSITE_UPDATE_PLOT_DATA_URL = "http://localhost:1990/update_plot_data";
         System.out.println(WEBSITE_GET_DATA_STATUS_URL);
     }
 

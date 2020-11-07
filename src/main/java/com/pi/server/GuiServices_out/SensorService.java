@@ -87,141 +87,37 @@ public class SensorService {
             for (String sensor : sensorslist) {
                 if (sensor.contains(SENSOR_BME680)) {
                     Sensor_BME680_entity bme680 = (Sensor_BME680_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME680, location);
-                    map.put("latest_iaq_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
-                    map.put("latest_temp_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
-                    map.put("latest_relhum_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
-                    map.put("latest_abshum_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getAbs_hum()));
-
-                    if (location.equals(currReqLocation)){
-                        map.put("latest_plot_iaq", new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
-                        map.put("latest_plot_temp", new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
-                        map.put("latest_plot_relhum", new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
-                    }
-
-                    if(bme680.getId() < currentTimeInMillis-1000*60*20) //Daten älter als 20 min
-                        sensorNoContactRedList.add("BME680 (" + location + ") ");
-                    else if (bme680.getId() < currentTimeInMillis-1000*30) //Daten älter als 30s
-                        sensorNoContactYellowList.add("BME680 (" + location + ") ");
-
-                    double iaq = bme680.getIaq();
-                    if(iaq >=200)
-                        iaqRedList.add(location + " (" + Math.round(iaq) + ") ");
-                    else if (iaq >= 150)
-                        iaqYellowList.add(location + " (" + Math.round(iaq) + ") ");
-
-                    double temp = bme680.getTemp();
-                    double absHum = currentWeatherData.getAbs_hum();
-                    double psat = 611.2*exp(17.62*temp/(243.12+temp)); //psat in Pa (Magnus-Formel Wikipedia)
-                    double relHum_Lueftung = absHum*461.52*(temp+273.15)/(10*psat); //relative Feuchte in % aus idealem Gasgesetz
-
-                    double rel_hum = bme680.getRel_hum();
-                    if(rel_hum >=80)
-                        humRedList.add(location + " (" + Math.round(rel_hum) + "%&rarr;" + Math.round(relHum_Lueftung) + "%) ");
-                    else if (rel_hum >=60)
-                        humYellowList.add(location + " (" + Math.round(rel_hum) + "%&rarr;" + Math.round(relHum_Lueftung) + "%) ");
+                    putDataIntoMapForFrontend_BME680(currReqLocation, map, location, bme680);
+                    sensorStatus(currentTimeInMillis, sensorNoContactYellowList, sensorNoContactRedList, location, bme680.getId(), "BME680 (");
+                    iaqStatus(iaqYellowList, iaqRedList, location, bme680.getIaq());
+                    humidityStatus(currentWeatherData, humYellowList, humRedList, location, bme680.getTemp(), bme680.getRel_hum());
 
                 }else if (sensor.contains(SENSOR_BME280)) {
                     Sensor_BME280_entity bme280 = (Sensor_BME280_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_BME280, location);
-                    map.put("latest_temp_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
-                    map.put("latest_relhum_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
-                    map.put("latest_abshum_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getAbs_hum()));
-
-                    if (location.equals(currReqLocation)){
-                        map.put("latest_plot_iaq", new Mav_XYPlotData(bme280.getId(), 0));
-                        map.put("latest_plot_temp", new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
-                        map.put("latest_plot_relhum", new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
-                    }
-
-                    if(bme280.getId() < currentTimeInMillis-1000*60*20) //Daten älter als 20 min
-                        sensorNoContactRedList.add("BME280 (" + location + ") ");
-                    else if (bme280.getId() < currentTimeInMillis-1000*30) //Daten älter als 30s
-                        sensorNoContactYellowList.add("BME280 (" + location + ") ");
-
-                    double temp = bme280.getTemp();
-                    double absHum = currentWeatherData.getAbs_hum();
-                    double psat = 611.2*exp(17.62*temp/(243.12+temp)); //psat in Pa (Magnus-Formel Wikipedia)
-                    double relHum_Lueftung = absHum*461.52*(temp+273.15)/(10*psat); //relative Feuchte in % aus idealem Gasgesetz
-
-                    double rel_hum = bme280.getRel_hum();
-                    if(rel_hum >=80)
-                        humRedList.add(location + " (" + Math.round(rel_hum) + "%&rarr;" + Math.round(relHum_Lueftung) + "%) ");
-                    else if (rel_hum >=60)
-                        humYellowList.add(location + " (" + Math.round(rel_hum) + "%&rarr;" + Math.round(relHum_Lueftung) + "%) ");
+                    putDataIntoMapForFrontend_BME280(currReqLocation, map, location, bme280);
+                    sensorStatus(currentTimeInMillis, sensorNoContactYellowList, sensorNoContactRedList, location, bme280.getId(), "BME280 (");
+                    humidityStatus(currentWeatherData, humYellowList, humRedList, location, bme280.getTemp(), bme280.getRel_hum());
 
                 }else if (sensor.contains(SENSOR_PARTICLE)) {
                     Sensor_Particle_entity particle = (Sensor_Particle_entity) persistingService_sensors.getLastItem_withTableName(SENSOR_PARTICLE, location);
-                    map.put("latest_pm25_" + location, new Mav_XYPlotData(particle.getId(), particle.getPm25()));
-                    map.put("latest_pm10_" + location, new Mav_XYPlotData(particle.getId(), particle.getPm10()));
+                    putDataIntoMapForFrontend_Particle(currReqLocation, map, location, particle);
+                    sensorStatus(currentTimeInMillis, sensorNoContactYellowList, sensorNoContactRedList, location, particle.getId(), "Partikelsensor (");
+                    particleStatus(particleYellowList, particleRedList, location, particle);
 
-                    if (location.equals(currReqLocation)){
-                        map.put("latest_plot_pm25", new Mav_XYPlotData(particle.getId(), particle.getPm25()));
-                        map.put("latest_plot_pm10", new Mav_XYPlotData(particle.getId(), particle.getPm10()));
-                    }
-
-                    if(particle.getId() < currentTimeInMillis-1000*60*20) //Daten älter als 20 min
-                        sensorNoContactRedList.add("Partikelsensor (" + location + ") ");
-                    else if (particle.getId() < currentTimeInMillis-1000*30) //Daten älter als 30s
-                        sensorNoContactYellowList.add("Partikelsensor (" + location + ") ");
-
-                    double pm10 = particle.getPm10();
-                    if (pm10 >= 40){
-                        particleRedList.add(location + " PM10(" + Math.round(pm10) + ") ");
-                    }else if(pm10 >=20)
-                        particleYellowList.add(location + " PM10(" + Math.round(pm10) + ") ");
-
-                    double pm25 = particle.getPm25();
-                    if (pm25 >= 20){
-                        particleRedList.add(location + " PM2,5(" + Math.round(pm25) + ") ");
-                    }else if(pm25 >=10)
-                        particleYellowList.add(location + " PM2,5(" + Math.round(pm25) + ") ");
                 }else
                     System.out.println("No matching entry found");
             }
         }
 
-        if (sensorNoContactYellowList.size() > 0 && sensorNoContactRedList.size() > 0) {
-            sensor_color = "opacity_alert";
-            sensor_report = String.join(",", sensorNoContactYellowList) + "min. 30s keinen Kontakt " + String.join(",", sensorNoContactRedList) + "min. 20min keinen Kontakt";
-        }else if  (sensorNoContactYellowList.size() > 0){
-            sensor_color = "opacity_warning";
-            sensor_report = String.join(",", sensorNoContactYellowList) + "min. 30s keinen Kontakt";
-        }else if  (sensorNoContactRedList.size() > 0){
-            sensor_color = "opacity_alert";
-            sensor_report = String.join(",", sensorNoContactRedList) + "min. 20min keinen Kontakt";
-        }
+        sensor_color = settingStatusColors(sensorNoContactYellowList, sensorNoContactRedList, sensor_color);
+        voc_color = settingStatusColors(iaqYellowList, iaqRedList, voc_color);
+        hum_color = settingStatusColors(humYellowList, humRedList, hum_color);
+        particle_color = settingStatusColors(particleYellowList, particleRedList, particle_color);
 
-        if (iaqYellowList.size() > 0 && iaqRedList.size() > 0) {
-            voc_color = "opacity_alert";
-            voc_report = String.join(",", iaqYellowList) + "erhöht und " + String.join(",", iaqRedList) + "kritisch. Sofort Lüften!";
-        }else if  (iaqYellowList.size() > 0){
-            voc_color = "opacity_warning";
-            voc_report = String.join(",", iaqYellowList) + "erhöht. Eventuell Lüften!";
-        }else if  (iaqRedList.size() > 0){
-            voc_color = "opacity_alert";
-            voc_report = String.join(",", iaqRedList) + "kritisch. Sofort Lüften!";
-        }
-
-        if (humYellowList.size() > 0 && humRedList.size() > 0) {
-            hum_color = "opacity_alert";
-            hum_report = String.join(",", humYellowList) + "erhöht und " + String.join(",", humRedList) + "kritisch.";
-        }else if  (humYellowList.size() > 0){
-            hum_color = "opacity_warning";
-            hum_report = String.join(",", humYellowList) + "erhöht.";
-        }else if  (humRedList.size() > 0){
-            hum_color = "opacity_alert";
-            hum_report = String.join(",", humRedList) + "kritisch.";
-        }
-
-        if (particleYellowList.size() > 0 && particleRedList.size() > 0) {
-            particle_color = "opacity_alert";
-            particle_report = String.join(",", particleYellowList) + "noch unter EU Grenzwert und " + String.join(",", particleRedList) + "über Grenzwert für PM2,5 max 20&mu;g/m&sup3; und PM10 max 40&mu;g/m&sup3;";
-        }else if  (particleYellowList.size() > 0){
-            particle_color = "opacity_warning";
-            particle_report = String.join(",", particleYellowList) + "noch unter EU Grenzwert für PM2,5 max 20&mu;g/m&sup3; und PM10 max 40&mu;g/m&sup3;";
-        }else if  (particleRedList.size() > 0){
-            particle_color = "opacity_alert";
-            particle_report = String.join(",", particleRedList) + "über EU Grenzwert für PM2,5 max 20&mu;g/m&sup3; und PM10 max 40&mu;g/m&sup3;";
-        }
+        sensor_report = settingStatusReport(sensor_report, sensorNoContactYellowList, sensorNoContactRedList, "min. 30s keinen Kontakt ", "min. 20min keinen Kontakt", "min. 30s keinen Kontakt");
+        voc_report = settingStatusReport(voc_report, iaqYellowList, iaqRedList, "erhöht und ", "kritisch. Sofort Lüften!", "erhöht. Eventuell Lüften!");
+        hum_report = settingStatusReport(hum_report, humYellowList, humRedList, "erhöht und ", "kritisch.", "erhöht.");
+        particle_report = settingStatusReport(particle_report, particleYellowList, particleRedList, "noch unter EU Grenzwert und ", "über Grenzwert für PM2,5 max 20&mu;g/m&sup3; und PM10 max 40&mu;g/m&sup3;", "noch unter EU Grenzwert für PM2,5 max 20&mu;g/m&sup3; und PM10 max 40&mu;g/m&sup3;");
 
         map.put("sensor_report", sensor_report);
         map.put("sensor_color", sensor_color);
@@ -233,5 +129,99 @@ public class SensorService {
         map.put("particle_color", particle_color);
 
         return map;
+    }
+
+    private String settingStatusReport(String sensor_report, List<String> sensorNoContactYellowList, List<String> sensorNoContactRedList, String yellowStringBeforeRed, String redString, String onlyYellowString) {
+        if (sensorNoContactYellowList.size() > 0 && sensorNoContactRedList.size() > 0) {
+            sensor_report = String.join(",", sensorNoContactYellowList) + yellowStringBeforeRed + String.join(",", sensorNoContactRedList) + redString;
+        } else if (sensorNoContactYellowList.size() > 0) {
+            sensor_report = String.join(",", sensorNoContactYellowList) + onlyYellowString;
+        } else if (sensorNoContactRedList.size() > 0) {
+            sensor_report = String.join(",", sensorNoContactRedList) + redString;
+        }
+        return sensor_report;
+    }
+
+    private String settingStatusColors(List<String> yellowList, List<String> redList, String color) {
+        if (redList.size() > 0) {
+            color = "opacity_alert";
+        }else if  (yellowList.size() > 0){
+            color = "opacity_warning";
+        }
+        return color;
+    }
+
+    private void iaqStatus(List<String> iaqYellowList, List<String> iaqRedList, String location, double iaq) {
+        if(iaq >=200)
+            iaqRedList.add(location + " (" + Math.round(iaq) + ") ");
+        else if (iaq >= 150)
+            iaqYellowList.add(location + " (" + Math.round(iaq) + ") ");
+    }
+
+    private void particleStatus(List<String> particleYellowList, List<String> particleRedList, String location, Sensor_Particle_entity particle) {
+        double pm10 = particle.getPm10();
+        if (pm10 >= 40){
+            particleRedList.add(location + " PM10(" + Math.round(pm10) + ") ");
+        }else if(pm10 >=20)
+            particleYellowList.add(location + " PM10(" + Math.round(pm10) + ") ");
+
+        double pm25 = particle.getPm25();
+        if (pm25 >= 20){
+            particleRedList.add(location + " PM2,5(" + Math.round(pm25) + ") ");
+        }else if(pm25 >=10)
+            particleYellowList.add(location + " PM2,5(" + Math.round(pm25) + ") ");
+    }
+
+    private void humidityStatus(Weather_current_entity currentWeatherData, List<String> humYellowList, List<String> humRedList, String location, double temp, double rel_hum) {
+        double absHum = currentWeatherData.getAbs_hum();
+        double psat = 611.2*exp(17.62*temp/(243.12+temp)); //psat in Pa (Magnus-Formel Wikipedia)
+        double relHum_Lueftung = absHum*461.52*(temp+273.15)/(10*psat); //relative Feuchte in % aus idealem Gasgesetz
+
+        if(rel_hum >=80)
+            humRedList.add(location + " (" + Math.round(rel_hum) + "%&rarr;" + Math.round(relHum_Lueftung) + "%) ");
+        else if (rel_hum >=60)
+            humYellowList.add(location + " (" + Math.round(rel_hum) + "%&rarr;" + Math.round(relHum_Lueftung) + "%) ");
+    }
+
+    private void sensorStatus(long currentTimeInMillis, List<String> sensorNoContactYellowList, List<String> sensorNoContactRedList, String location, long id_timestamp, String sensorName) {
+        if (id_timestamp < currentTimeInMillis - 1000 * 60 * 20) //Daten älter als 20 min
+            sensorNoContactRedList.add(sensorName + location + ") ");
+        else if (id_timestamp < currentTimeInMillis - 1000 * 30) //Daten älter als 30s
+            sensorNoContactYellowList.add(sensorName + location + ") ");
+    }
+
+    private void putDataIntoMapForFrontend_Particle(String currReqLocation, HashMap<String, Object> map, String location, Sensor_Particle_entity particle) {
+        map.put("latest_pm25_" + location, new Mav_XYPlotData(particle.getId(), particle.getPm25()));
+        map.put("latest_pm10_" + location, new Mav_XYPlotData(particle.getId(), particle.getPm10()));
+
+        if (location.equals(currReqLocation)){
+            map.put("latest_plot_pm25", new Mav_XYPlotData(particle.getId(), particle.getPm25()));
+            map.put("latest_plot_pm10", new Mav_XYPlotData(particle.getId(), particle.getPm10()));
+        }
+    }
+
+    private void putDataIntoMapForFrontend_BME280(String currReqLocation, HashMap<String, Object> map, String location, Sensor_BME280_entity bme280) {
+        map.put("latest_temp_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
+        map.put("latest_relhum_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
+        map.put("latest_abshum_" + location, new Mav_XYPlotData(bme280.getId(), bme280.getAbs_hum()));
+
+        if (location.equals(currReqLocation)){
+            map.put("latest_plot_iaq", new Mav_XYPlotData(bme280.getId(), 0));
+            map.put("latest_plot_temp", new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
+            map.put("latest_plot_relhum", new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
+        }
+    }
+
+    private void putDataIntoMapForFrontend_BME680(String currReqLocation, HashMap<String, Object> map, String location, Sensor_BME680_entity bme680) {
+        map.put("latest_iaq_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
+        map.put("latest_temp_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
+        map.put("latest_relhum_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
+        map.put("latest_abshum_" + location, new Mav_XYPlotData(bme680.getId(), bme680.getAbs_hum()));
+
+        if (location.equals(currReqLocation)){
+            map.put("latest_plot_iaq", new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
+            map.put("latest_plot_temp", new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
+            map.put("latest_plot_relhum", new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
+        }
     }
 }
