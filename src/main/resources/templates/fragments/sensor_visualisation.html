@@ -4,32 +4,16 @@
             <table class="table table-dark no_margin table-opacity_and_color">
                 <tbody>
                     <tr>
-                        <td th:id="sensor_status"><b>Sensoren:</b><br><i>nicht alle Sensoren laufen korrekt</i></td>
-                        <script th:inline="javascript">
-                            var element = document.getElementById("sensor_status");
-                            element.classList.add('opacity_warning');
-                        </script>
+                        <td th:id="sensor_status"><b>Sensoren:</b><br><i>loading</i></td>
                     </tr>
                     <tr>
-                        <td th:id="voc_status"><b>VOC:</b><br><i>ist deutlich zu hoch!</i></td>
-                        <script th:inline="javascript">
-                            var element = document.getElementById("voc_status");
-                            element.classList.add('opacity_alert');
-                        </script>
+                        <td th:id="voc_status"><b>VOC:</b><br><i>loading</i></td>
                     </tr>
                     <tr>
-                        <td th:id="humidity_status"><b>Feuchtigkeit:</b><br><i>Muss neu gedacht werden</i></td>
-                        <script th:inline="javascript">
-                            var element = document.getElementById("humidity_status");
-                            element.classList.add('opacity_test');
-                        </script>
+                        <td th:id="humidity_status"><b>Feuchtigkeit:</b><br><i>loading</i></td>
                     </tr>
                     <tr>
-                        <td th:id="particle_status"><b>Partikel:</b><br><i>das kann nicht sein</i></td>
-                        <script th:inline="javascript">
-                            var element = document.getElementById("particle_status");
-                            element.classList.add('opacity_ok');
-                        </script>
+                        <td th:id="particle_status"><b>Partikel:</b><br><i>loading</i></td>
                     </tr>
                 </tbody>
             </table>
@@ -228,6 +212,15 @@
                     <td id="bad_temp">-</td>
                     <td id="bad_relhum">-</td>
                     <td id="bad_abshum">-</td>
+                </tr>
+                <tr>
+                    <th>Schlafz.</th>
+                    <td id="schlafzimmer_pm25">-</td>
+                    <td id="schlafzimmer_pm10">-</td>
+                    <td id="schlafzimmer_iaq">-</td>
+                    <td id="schlafzimmer_temp">-</td>
+                    <td id="schlafzimmer_relhum">-</td>
+                    <td id="schlafzimmer_abshum">-</td>
                 </tr>
                 <tr>
                     <th>Wetter</th>

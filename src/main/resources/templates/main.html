@@ -66,6 +66,13 @@
                     document.getElementById('bad_relhum').innerHTML   = Math.round(newPlotData.latest_280relhum.y*100)/100+'%';
                     document.getElementById('bad_abshum').innerHTML   = Math.round(newPlotData.latest_280abshum.y*100)/100+'g/m&sup3;';
 
+                    document.getElementById('schlafzimmer_pm25').innerHTML     = "-";
+                    document.getElementById('schlafzimmer_pm10').innerHTML     = "-";
+                    document.getElementById('schlafzimmer_iaq').innerHTML      = Math.round(newPlotData.latest_iaq_schl.y*100)/100;
+                    document.getElementById('schlafzimmer_temp').innerHTML     = Math.round(newPlotData.latest_680temp_schl.y*100)/100+'°C';
+                    document.getElementById('schlafzimmer_relhum').innerHTML   = Math.round(newPlotData.latest_680relhum_schl.y*100)/100+'%';
+                    document.getElementById('schlafzimmer_abshum').innerHTML   = Math.round(newPlotData.latest_680abshum_schl.y*100)/100+'g/m&sup3;';
+
                     var tempaussen      = /*[[${latestWeather.temp}]]*/;
                     var rel_hum_aussen  = /*[[${latestWeather.rel_hum}]]*/;
                     var abs_hum_aussen  = /*[[${latestWeather.abs_hum}]]*/;
@@ -76,6 +83,34 @@
                     document.getElementById('wetter_temp').innerHTML     = Math.round(tempaussen*100)/100+'°C';
                     document.getElementById('wetter_relhum').innerHTML   = Math.round(rel_hum_aussen*100)/100+'%';
                     document.getElementById('wetter_abshum').innerHTML   = Math.round(abs_hum_aussen*100)/100+'g/m&sup3;';
+
+                    var element = document.getElementById("sensor_status");
+                    element.innerHTML = "<b>Sensoren:</b><br><i>" + newPlotData.sensor_report + "</i>";
+                    element.classList.remove("opacity_ok");
+                    element.classList.remove("opacity_alert");
+                    element.classList.remove("opacity_warning");
+                    element.classList.add(newPlotData.sensor_color);
+
+                    var element = document.getElementById("voc_status");
+                    element.innerHTML = "<b>VOC:</b><br><i>" + newPlotData.voc_report + "</i>";
+                    element.classList.remove("opacity_ok");
+                    element.classList.remove("opacity_alert");
+                    element.classList.remove("opacity_warning");
+                    element.classList.add(newPlotData.voc_color);
+
+                    var element = document.getElementById("humidity_status");
+                    element.innerHTML = "<b>Feuchtigkeit:</b><br><i>" + newPlotData.hum_report + "</i>";
+                    element.classList.remove("opacity_ok");
+                    element.classList.remove("opacity_alert");
+                    element.classList.remove("opacity_warning");
+                    element.classList.add(newPlotData.hum_color);
+
+                    var element = document.getElementById("particle_status");
+                    element.innerHTML = "<b>Partikel:</b><br><i>" + newPlotData.particle_report + "</i>";
+                    element.classList.remove("opacity_ok");
+                    element.classList.remove("opacity_alert");
+                    element.classList.remove("opacity_warning");
+                    element.classList.add(newPlotData.particle_color);
                 }
             }
         }
