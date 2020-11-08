@@ -40,7 +40,6 @@
                                "data": /*[[${pm10}]]*/,
                                "fill":false,
                                "borderDash": [5, 5],
-                               "borderWidth": 4,
                                "borderColor":"rgb(2, 117, 216)",
                                "lineTension":0.1,
                                yAxisID: 'particle-y-axis'
@@ -115,7 +114,7 @@
                                "lineTension":0.1,
                                yAxisID: 'temp-y-axis'
                              },{
-                             "label":"Innen [%RH]",
+                             "label":"Innenfeuchte [g/m\u00B3]",
                                "data": /*[[${rel_hum}]]*/,
                                "fill":false,
                                "borderColor":"rgb(8,144,0)",
@@ -130,6 +129,13 @@
                                "borderColor":"rgb(2, 117, 216)",
                                "lineTension":0.1,
                                yAxisID: 'temp-y-axis'
+                             },{
+                             "label":"Außenfeuchte [g/m\u00B3]",
+                               "data": /*[[${currentweather_abshumlist}]]*/,
+                               "fill":false,
+                               "borderColor":"rgb(144,238,144)",
+                               "lineTension":0.1,
+                               yAxisID: 'humidity-y-axis'
                              }
                           ]
                          },
@@ -158,7 +164,7 @@
                                 position: 'right',
                                 ticks: {
                                     callback: function(value, index, values) {
-                                        return value + '%';
+                                        return value + 'g/m\u00B3';
                                     }
                                 }
                                 }

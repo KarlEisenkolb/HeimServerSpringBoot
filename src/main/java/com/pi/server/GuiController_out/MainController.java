@@ -3,6 +3,7 @@ package com.pi.server.GuiController_out;
 import com.pi.server.GuiServices_out.MainService;
 import com.pi.server.GuiServices_out.SensorService;
 import com.pi.server.GuiServices_out.ServerDataStatusService;
+import com.pi.server.Models.OpenWeather.WeatherForecast_hourly_entity;
 import com.pi.server.Models.OpenWeather.Weather_current_entity;
 import com.pi.server.Models.SensorModels.Mav_XYPlotData;
 import com.pi.server.Models.SensorModels.BME680.Sensor_BME680_entity;
@@ -72,9 +73,9 @@ public class MainController {
     }
 
     private void basicData(ModelAndView mav, String location) {
-        WEBSITE_UPDATE_PLOT_DATA_URL += "/?location=" + location;
+        String WEBSITE_UPDATE_PLOT_DATA_URL_WITH_PARAM = WEBSITE_UPDATE_PLOT_DATA_URL +  "/?location=" + location;
         mav.addObject("website_get_data_status_url", WEBSITE_GET_DATA_STATUS_URL);
-        mav.addObject("website_update_plot_data_url", WEBSITE_UPDATE_PLOT_DATA_URL);
+        mav.addObject("website_update_plot_data_url", WEBSITE_UPDATE_PLOT_DATA_URL_WITH_PARAM);
         mav.addObject("time_and_date_string_long", mainService.getTimeAndDateString(mainService.DATE_LONG));
         mav.addObject("time_and_date_string_short", mainService.getTimeAndDateString(mainService.DATE_SHORT));
     }
@@ -103,16 +104,16 @@ public class MainController {
         List bme680List = sensorService.getBme680Content(location);
         List<Mav_XYPlotData> iaq        = new ArrayList<>();
         List<Mav_XYPlotData> temp_in    = new ArrayList<>();
-        List<Mav_XYPlotData> rel_hum    = new ArrayList<>();
+        List<Mav_XYPlotData> abs_hum    = new ArrayList<>();
 
         for(Sensor_BME680_entity bme680 : (List<Sensor_BME680_entity>)(List<?>) bme680List){
             iaq.add(    new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
             temp_in.add(new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
-            rel_hum.add(new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
+            abs_hum.add(new Mav_XYPlotData(bme680.getId(), bme680.getAbs_hum()));
         }
         mav.addObject("iaq", iaq);
         mav.addObject("temp_in", temp_in);
-        mav.addObject("rel_hum", rel_hum);
+        mav.addObject("rel_hum", abs_hum);
 
 
         List particleList = sensorService.getParticleContent(location);
@@ -128,10 +129,20 @@ public class MainController {
 
         List currentWeatherDataList = sensorService.getCurrentWeatherData();
         List<Mav_XYPlotData> currentweather_templist   = new ArrayList<>();
+        List<Mav_XYPlotData> currentweather_abshumlist   = new ArrayList<>();
 
         for(Weather_current_entity currentWeather : (List<Weather_current_entity>)(List<?>) currentWeatherDataList){
             currentweather_templist.add(new Mav_XYPlotData(currentWeather.getRequest_timestamp(), currentWeather.getTemp()));
+            currentweather_abshumlist.add(new Mav_XYPlotData(currentWeather.getRequest_timestamp(), currentWeather.getAbs_hum()));
         }
+
+        List weatherHourlyList = mainService.getWeatherHourlyForecastContent();
+        for (int i=1;i<10;i++){
+            WeatherForecast_hourly_entity hourlyWeather = (WeatherForecast_hourly_entity) weatherHourlyList.get(i);
+            currentweather_templist.add(new Mav_XYPlotData(hourlyWeather.getTime()*1000, hourlyWeather.getTemp()));
+        }
+
         mav.addObject("currentweather_templist", currentweather_templist);
+        mav.addObject("currentweather_abshumlist", currentweather_abshumlist);
     }
 }

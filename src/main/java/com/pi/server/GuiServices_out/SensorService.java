@@ -29,7 +29,7 @@ public class SensorService {
     @Autowired
     private PersistingService_Weather persistingService_weather;
 
-    long timeIntervall = 36*60*60*1000; // 36h in millis
+    long timeIntervall = 24*60*60*1000; // 24h in millis
 
     public SensorService(){}
 
@@ -59,6 +59,7 @@ public class SensorService {
         Weather_current_entity currentWeatherData   = (Weather_current_entity) persistingService_weather.getLastItem(CurrentWeather);
         HashMap<String, Object> map = new HashMap<>();
         map.put("latest_plot_aussentemp", new Mav_XYPlotData(currentWeatherData.getRequest_timestamp(), currentWeatherData.getTemp()));
+        map.put("latest_plot_aussenabshum", new Mav_XYPlotData(currentWeatherData.getRequest_timestamp(), currentWeatherData.getAbs_hum()));
 
         String sensor_report = "Alle Sensoren verbunden. Daten sind aktuell";
         List<String> sensorNoContactYellowList = new ArrayList<>();
@@ -208,7 +209,7 @@ public class SensorService {
         if (location.equals(currReqLocation)){
             map.put("latest_plot_iaq", new Mav_XYPlotData(bme280.getId(), 0));
             map.put("latest_plot_temp", new Mav_XYPlotData(bme280.getId(), bme280.getTemp()));
-            map.put("latest_plot_relhum", new Mav_XYPlotData(bme280.getId(), bme280.getRel_hum()));
+            map.put("latest_plot_abshum", new Mav_XYPlotData(bme280.getId(), bme280.getAbs_hum()));
         }
     }
 
@@ -221,7 +222,7 @@ public class SensorService {
         if (location.equals(currReqLocation)){
             map.put("latest_plot_iaq", new Mav_XYPlotData(bme680.getId(), bme680.getIaq()));
             map.put("latest_plot_temp", new Mav_XYPlotData(bme680.getId(), bme680.getTemp()));
-            map.put("latest_plot_relhum", new Mav_XYPlotData(bme680.getId(), bme680.getRel_hum()));
+            map.put("latest_plot_abshum", new Mav_XYPlotData(bme680.getId(), bme680.getAbs_hum()));
         }
     }
 }

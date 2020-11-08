@@ -48,8 +48,9 @@
                     particleChart.update();
 
                     temperatureChart.data.datasets[0].data.push(newPlotData.latest_plot_temp);
-                    temperatureChart.data.datasets[1].data.push(newPlotData.latest_plot_relhum);
-                    temperatureChart.data.datasets[2].data.push(newPlotData.latest_plot_aussentemp);
+                    temperatureChart.data.datasets[1].data.push(newPlotData.latest_plot_abshum);
+                    //temperatureChart.data.datasets[2].data.push(newPlotData.latest_plot_aussentemp);
+                    temperatureChart.data.datasets[3].data.push(newPlotData.latest_plot_aussenabshum);
                     temperatureChart.update();
 
                     document.getElementById('diele_pm25').innerHTML     = Math.round(newPlotData.latest_pm25_bibliothek.y*100)/100+'&mu;g/m&sup3;';
