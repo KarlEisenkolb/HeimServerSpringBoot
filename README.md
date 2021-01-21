@@ -6,7 +6,8 @@ Folgende Aufgaben sollen vom Server ausgeführt werden:
 - Verschicken von Notifications an alle Smartphones der beteiligten Personen bei Änderung der Datenlage bestimmter Apps: Terminänderungen, neue Aufgaben, Aufgabe erledigt etc.
 - Verschlüsselung der Daten für Firebase Firestore (Daten liegen im Cloud-Speicher verschlüsselt vor.)
 - Anzeige, Echtzeitaktualiserung und tabellarische sowie visuelle Aufbereitung von Sensordaten der Wohnumgebung mittels chart.js
-- Beurteilung der Sensordaten und visuelle Warnung bei Überschreitung von Grenzwerten
+- Beurteilung der Sensordaten und visuelle Warnung bei Überschreitung von Grenzwerten (EU-Feinstaubnorm, Aerosole, Kondensationsgefahr, Essensgeruch wegen VOC's etc.)
+- Professioneller Lüftungsvorgang: Es kann jederzeit berurteilt werden, ob sich durch einen Lüftungsvorgang die Feuchtigkeit in der Wohnumgebung erhöhen oder senken würde. Der Lüftungsvorgang hat den stationären Zustand erreicht, wenn im linken Diagramm die dunkelgrüne Linie (absolute Feuchte innen) während des Lüftens die hellgründe Linie erreicht (absolute Feuchte in der Umwelt). 
 - Server läuft auf einem Raspberry Pi
 
 ![grab-landing-page](https://github.com/KarlEisenkolb/HeimServerSpringBoot/blob/master/images/smartMonitor.jpg)
